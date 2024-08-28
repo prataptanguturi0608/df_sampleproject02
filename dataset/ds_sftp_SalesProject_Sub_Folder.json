@@ -6,7 +6,10 @@
 			"type": "LinkedServiceReference"
 		},
 		"parameters": {
-			"p_subFolder": {
+			"p_ds_subFolder": {
+				"type": "string"
+			},
+			"p_ds_FileName": {
 				"type": "string"
 			}
 		},
