@@ -9,9 +9,7 @@
 		"type": "DelimitedText",
 		"typeProperties": {
 			"location": {
-				"type": "SftpLocation",
-				"fileName": "*.csv",
-				"folderPath": "/Products"
+				"type": "SftpLocation"
 			},
 			"columnDelimiter": ",",
 			"escapeChar": "\\",
