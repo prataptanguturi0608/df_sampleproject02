@@ -81,7 +81,7 @@
 											"type": "Expression"
 										},
 										"p_ds_FileName": {
-											"value": "@variables('v_Filename')",
+											"value": "@item().name",
 											"type": "Expression"
 										}
 									}
