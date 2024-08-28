@@ -1,6 +1,7 @@
 {
 	"name": "pl_SFTP_activity",
 	"properties": {
+		"description": "https://learn.microsoft.com/en-us/azure/data-factory/concepts-nested-activities",
 		"activities": [
 			{
 				"name": "Get Metadata1",
