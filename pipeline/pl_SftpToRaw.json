@@ -93,7 +93,7 @@
 									"referenceName": "ds_sftp_SalesProject_Sub_Folder",
 									"type": "DatasetReference",
 									"parameters": {
-										"p_subFolder": {
+										"p_ds_subFolder": {
 											"value": "@variables('v_subFolder')",
 											"type": "Expression"
 										}
