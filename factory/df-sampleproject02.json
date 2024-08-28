@@ -1,0 +1,9 @@
+{
+	"name": "df-sampleproject02",
+	"location": "centralus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "993ad0de-398b-4271-8151-6158cd83d687",
+		"tenantId": "0320f3ce-af6b-4b19-80da-d948d9d67a09"
+	}
+}
