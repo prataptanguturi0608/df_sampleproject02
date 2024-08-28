@@ -19,9 +19,7 @@
 						"referenceName": "ds_sftp_sales",
 						"type": "DatasetReference"
 					},
-					"fieldList": [
-						"childItems"
-					],
+					"fieldList": [],
 					"storeSettings": {
 						"type": "SftpReadSettings",
 						"enablePartitionDiscovery": false,
@@ -52,7 +50,8 @@
 					"isSequential": true,
 					"activities": [
 						{
-							"name": "Copy data1",
+							"name": "CopySalesData",
+							"description": "Copying Sales data files from SFTP to Bronze(ADLS)",
 							"type": "Copy",
 							"dependsOn": [],
 							"policy": {
@@ -76,21 +75,48 @@
 										"type": "DelimitedTextReadSettings"
 									}
 								},
-								"enableStaging": false
+								"sink": {
+									"type": "DelimitedTextSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings",
+										"copyBehavior": "PreserveHierarchy"
+									},
+									"formatSettings": {
+										"type": "DelimitedTextWriteSettings",
+										"quoteAllText": true,
+										"fileExtension": ".txt"
+									}
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
 							},
 							"inputs": [
 								{
 									"referenceName": "ds_sftp_sales",
 									"type": "DatasetReference"
 								}
+							],
+							"outputs": [
+								{
+									"referenceName": "ds_Sftp_bronze",
+									"type": "DatasetReference"
+								}
 							]
 						},
 						{
-							"name": "Copy data2",
+							"name": "ArchivingSalesData",
+							"description": "Archiving Sales data files to Archive folder",
 							"type": "Copy",
 							"dependsOn": [
 								{
-									"activity": "Copy data1",
+									"activity": "CopySalesData",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -105,15 +131,62 @@
 							},
 							"userProperties": [],
 							"typeProperties": {
-								"enableStaging": false
-							}
+								"source": {
+									"type": "DelimitedTextSource",
+									"storeSettings": {
+										"type": "SftpReadSettings",
+										"recursive": true,
+										"enablePartitionDiscovery": false,
+										"disableChunking": false
+									},
+									"formatSettings": {
+										"type": "DelimitedTextReadSettings"
+									}
+								},
+								"sink": {
+									"type": "DelimitedTextSink",
+									"storeSettings": {
+										"type": "AzureBlobStorageWriteSettings",
+										"copyBehavior": "PreserveHierarchy"
+									},
+									"formatSettings": {
+										"type": "DelimitedTextWriteSettings",
+										"quoteAllText": true,
+										"fileExtension": ".txt"
+									}
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "ds_sftp_sales",
+									"type": "DatasetReference"
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "ds_Sftp_Archive",
+									"type": "DatasetReference"
+								}
+							]
 						},
 						{
-							"name": "Delete1",
+							"name": "DeletingSalesData",
+							"description": "Deleting Sales Data files from SFTP",
 							"type": "Delete",
+							"state": "Inactive",
+							"onInactiveMarkAs": "Succeeded",
 							"dependsOn": [
 								{
-									"activity": "Copy data2",
+									"activity": "ArchivingSalesData",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -128,7 +201,24 @@
 							},
 							"userProperties": [],
 							"typeProperties": {
-								"enableLogging": true
+								"dataset": {
+									"referenceName": "ds_sftp_sales",
+									"type": "DatasetReference"
+								},
+								"logStorageSettings": {
+									"linkedServiceName": {
+										"referenceName": "ls_AzureBlobStorageArchive",
+										"type": "LinkedServiceReference"
+									},
+									"path": "project02-activitylog"
+								},
+								"enableLogging": true,
+								"storeSettings": {
+									"type": "SftpReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false,
+									"disableChunking": false
+								}
 							}
 						}
 					]

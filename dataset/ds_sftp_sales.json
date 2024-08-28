@@ -13,6 +13,7 @@
 		"typeProperties": {
 			"location": {
 				"type": "SftpLocation",
+				"fileName": "*.csv",
 				"folderPath": "/SalesProject/sales"
 			},
 			"columnDelimiter": ",",
