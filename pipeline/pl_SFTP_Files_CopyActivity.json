@@ -172,6 +172,50 @@
 									}
 								}
 							]
+						},
+						{
+							"name": "Delete1",
+							"type": "Delete",
+							"dependsOn": [
+								{
+									"activity": "ArchiveFiles",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"dataset": {
+									"referenceName": "ds_sftp_SalesProject_Files",
+									"type": "DatasetReference",
+									"parameters": {
+										"p_ds_subFolder": "@concat('SalesProject','/',pipeline().parameters.p_SubFolder)",
+										"p_ds_FileName": "@item().name"
+									}
+								},
+								"logStorageSettings": {
+									"linkedServiceName": {
+										"referenceName": "ls_AzureBlobStorageArchive",
+										"type": "LinkedServiceReference"
+									},
+									"path": "project02-activitylog"
+								},
+								"enableLogging": true,
+								"storeSettings": {
+									"type": "SftpReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false,
+									"disableChunking": false
+								}
+							}
 						}
 					]
 				}
