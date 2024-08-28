@@ -128,13 +128,11 @@
 							},
 							"userProperties": [],
 							"typeProperties": {
-								"waitOnCompletion": true,
-								"parameters": {
-									"list_FileNames": {
-										"value": "@activity('GetFilesList').output.childItems",
-										"type": "Expression"
-									}
-								}
+								"pipeline": {
+									"referenceName": "pl_SFTP_Files_CopyActivity",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true
 							}
 						}
 					]
