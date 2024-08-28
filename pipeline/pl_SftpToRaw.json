@@ -16,7 +16,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"dataset": {
-						"referenceName": "ds_sftp_sales_Folder",
+						"referenceName": "ds_sftp_SalesProject_Folder",
 						"type": "DatasetReference"
 					},
 					"fieldList": [
@@ -229,7 +229,7 @@
 							"userProperties": [],
 							"typeProperties": {
 								"dataset": {
-									"referenceName": "ds_sftp_sales_Folder",
+									"referenceName": "ds_sftp_SalesProject_Folder",
 									"type": "DatasetReference"
 								},
 								"logStorageSettings": {
