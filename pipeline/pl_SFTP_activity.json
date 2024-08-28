@@ -110,6 +110,35 @@
 									"type": "ParquetReadSettings"
 								}
 							}
+						},
+						{
+							"name": "Execute Pipeline1",
+							"type": "ExecutePipeline",
+							"dependsOn": [
+								{
+									"activity": "GetFilesList",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "pl_SFTP_activity_copy1",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"list_Files": {
+										"value": "@activity('GetFilesList').output.childItems",
+										"type": "Expression"
+									}
+								}
+							}
 						}
 					]
 				}
