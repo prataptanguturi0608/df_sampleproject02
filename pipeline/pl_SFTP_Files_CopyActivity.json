@@ -166,7 +166,7 @@
 									"type": "DatasetReference",
 									"parameters": {
 										"p_ds_subFolder": {
-											"value": "@formatDateTime(utcNow(),'YYYY')\n\n",
+											"value": "@concat('SalesProject','/',pipeline().parameters.p_SubFolder,'/',formatDateTime(utcNow(),'yyyy'))\n\n",
 											"type": "Expression"
 										}
 									}
