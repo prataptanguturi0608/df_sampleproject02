@@ -1,9 +1,14 @@
 {
-	"name": "ds_sftp_Folder",
+	"name": "ds_sftp_SalesProject_Sub_Folder",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "ls_SftpStorage",
 			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"p_subFolder": {
+				"type": "string"
+			}
 		},
 		"folder": {
 			"name": "ADF_sampleproject02/ds_SFTP to Bronze"
@@ -13,7 +18,10 @@
 		"typeProperties": {
 			"location": {
 				"type": "SftpLocation",
-				"folderPath": "/SalesProject"
+				"folderPath": {
+					"value": "@concat('SalesProject','/',dataset().p_subFolder)",
+					"type": "Expression"
+				}
 			},
 			"columnDelimiter": ",",
 			"escapeChar": "\\",
