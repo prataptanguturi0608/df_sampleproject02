@@ -26,7 +26,7 @@
 					"type": "Expression"
 				},
 				"folderPath": {
-					"value": "@concat('SalesProject','/',dataset().p_ds_subFolder)",
+					"value": "@dataset().p_ds_subFolder",
 					"type": "Expression"
 				}
 			},
