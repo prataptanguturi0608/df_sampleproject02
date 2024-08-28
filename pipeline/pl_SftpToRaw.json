@@ -24,6 +24,7 @@
 					],
 					"storeSettings": {
 						"type": "SftpReadSettings",
+						"recursive": true,
 						"enablePartitionDiscovery": false,
 						"disableChunking": false
 					},
@@ -38,12 +39,6 @@
 				"dependsOn": [
 					{
 						"activity": "SFTP_SalesFileList",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					},
-					{
-						"activity": "SFTP_ProductsFileList",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -321,40 +316,13 @@
 						}
 					]
 				}
-			},
-			{
-				"name": "SFTP_ProductsFileList",
-				"type": "GetMetadata",
-				"dependsOn": [],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"dataset": {
-						"referenceName": "ds_sftp_products_Folder",
-						"type": "DatasetReference"
-					},
-					"fieldList": [
-						"childItems"
-					],
-					"storeSettings": {
-						"type": "SftpReadSettings",
-						"enablePartitionDiscovery": false,
-						"disableChunking": false
-					},
-					"formatSettings": {
-						"type": "DelimitedTextReadSettings"
-					}
-				}
 			}
 		],
 		"variables": {
 			"v_filename": {
+				"type": "String"
+			},
+			"v_subFolder": {
 				"type": "String"
 			}
 		},

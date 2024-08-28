@@ -17,7 +17,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"dataset": {
-						"referenceName": "ds_test_list_Folders_files",
+						"referenceName": "ds_test_list_Folders_files_copy1",
 						"type": "DatasetReference"
 					},
 					"fieldList": [
@@ -62,7 +62,7 @@
 							},
 							"userProperties": [],
 							"typeProperties": {
-								"variableName": "v_name",
+								"variableName": "v_subFolder",
 								"value": {
 									"value": "@item().name",
 									"type": "Expression"
@@ -75,6 +75,9 @@
 		],
 		"variables": {
 			"v_name": {
+				"type": "String"
+			},
+			"v_subFolder": {
 				"type": "String"
 			}
 		},
