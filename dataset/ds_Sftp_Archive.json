@@ -1,0 +1,25 @@
+{
+	"name": "ds_Sftp_Archive",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_AzureBlobStorageArchive",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "ADF_sampleproject02/ds_SFTP to Archive"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"container": "project02-archive"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	}
+}
