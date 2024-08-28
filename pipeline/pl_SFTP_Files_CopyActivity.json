@@ -166,7 +166,7 @@
 									"type": "DatasetReference",
 									"parameters": {
 										"p_ds_subFolder": {
-											"value": "@concat('SalesProject','/',pipeline().parameters.p_SubFolder)",
+											"value": "@concat('SalesProject','/',pipeline().parameters.p_SubFolder,'/',formatDateTime(utcNow(),'yyyy'),'/',formatDateTime(utcNow(),'MM'),'/',formatDateTime(utcNow(),'dd'))\n",
 											"type": "Expression"
 										}
 									}
@@ -176,6 +176,8 @@
 						{
 							"name": "Delete1",
 							"type": "Delete",
+							"state": "Inactive",
+							"onInactiveMarkAs": "Succeeded",
 							"dependsOn": [
 								{
 									"activity": "ArchiveFiles",
