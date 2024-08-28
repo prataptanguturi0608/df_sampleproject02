@@ -5,12 +5,20 @@
 			"referenceName": "ls_DLakeStorage",
 			"type": "LinkedServiceReference"
 		},
+		"parameters": {
+			"p_SubFolder": {
+				"type": "string"
+			}
+		},
 		"annotations": [],
 		"type": "Parquet",
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"folderPath": "CustomerOrders",
+				"folderPath": {
+					"value": "@concat('CustomerOrders','/',dataset().p_SubFolder)",
+					"type": "Expression"
+				},
 				"fileSystem": "silver"
 			},
 			"compressionCodec": "snappy"
