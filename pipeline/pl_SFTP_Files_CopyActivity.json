@@ -4,82 +4,21 @@
 		"description": "https://learn.microsoft.com/en-us/azure/data-factory/concepts-nested-activities",
 		"activities": [
 			{
-				"name": "GetFoldersList",
-				"type": "GetMetadata",
-				"dependsOn": [],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"dataset": {
-						"referenceName": "ds_test_list_Folders_files",
-						"type": "DatasetReference"
-					},
-					"fieldList": [
-						"childItems"
-					],
-					"storeSettings": {
-						"type": "AzureBlobFSReadSettings",
-						"recursive": true,
-						"enablePartitionDiscovery": false
-					},
-					"formatSettings": {
-						"type": "ParquetReadSettings"
-					}
-				}
-			},
-			{
 				"name": "ForEach1",
 				"type": "ForEach",
-				"dependsOn": [
-					{
-						"activity": "GetFoldersList",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
+				"dependsOn": [],
 				"userProperties": [],
 				"typeProperties": {
 					"items": {
-						"value": "@activity('GetFoldersList').output.childItems",
+						"value": "@pipeline().parameters.p_FilesList",
 						"type": "Expression"
 					},
 					"isSequential": true,
 					"activities": [
 						{
-							"name": "Set variable1",
-							"type": "SetVariable",
+							"name": "Copy data1",
+							"type": "Copy",
 							"dependsOn": [],
-							"policy": {
-								"secureOutput": false,
-								"secureInput": false
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"variableName": "v_subFolder",
-								"value": {
-									"value": "@item().name",
-									"type": "Expression"
-								}
-							}
-						},
-						{
-							"name": "GetFilesList",
-							"type": "GetMetadata",
-							"dependsOn": [
-								{
-									"activity": "Set variable1",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
 							"policy": {
 								"timeout": "0.12:00:00",
 								"retry": 0,
@@ -89,52 +28,58 @@
 							},
 							"userProperties": [],
 							"typeProperties": {
-								"dataset": {
-									"referenceName": "ds_test_list_Folders_files_copy1",
+								"source": {
+									"type": "DelimitedTextSource",
+									"storeSettings": {
+										"type": "SftpReadSettings",
+										"recursive": true,
+										"enablePartitionDiscovery": false,
+										"disableChunking": false
+									},
+									"formatSettings": {
+										"type": "DelimitedTextReadSettings"
+									}
+								},
+								"sink": {
+									"type": "DelimitedTextSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings",
+										"copyBehavior": "PreserveHierarchy"
+									},
+									"formatSettings": {
+										"type": "DelimitedTextWriteSettings",
+										"quoteAllText": true,
+										"fileExtension": ".txt"
+									}
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "ds_sftp_SalesProject_Sub_Folder",
 									"type": "DatasetReference",
 									"parameters": {
-										"p_SubFolder": {
-											"value": "@concat('CustomerOrders','/',variables('v_subFolder'))",
+										"p_subFolder": {
+											"value": "@pipeline().parameters.p_SubFolder",
 											"type": "Expression"
 										}
 									}
-								},
-								"fieldList": [
-									"childItems"
-								],
-								"storeSettings": {
-									"type": "AzureBlobFSReadSettings",
-									"enablePartitionDiscovery": false
-								},
-								"formatSettings": {
-									"type": "ParquetReadSettings"
-								}
-							}
-						},
-						{
-							"name": "Execute Pipeline1",
-							"type": "ExecutePipeline",
-							"dependsOn": [
-								{
-									"activity": "GetFilesList",
-									"dependencyConditions": [
-										"Succeeded"
-									]
 								}
 							],
-							"policy": {
-								"secureInput": false
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"waitOnCompletion": true,
-								"parameters": {
-									"list_Files": {
-										"value": "@activity('GetFilesList').output.childItems",
-										"type": "Expression"
-									}
+							"outputs": [
+								{
+									"referenceName": "ds_Sftp_bronze",
+									"type": "DatasetReference"
 								}
-							}
+							]
 						}
 					]
 				}
@@ -143,6 +88,9 @@
 		"parameters": {
 			"p_FilesList": {
 				"type": "array"
+			},
+			"p_SubFolder": {
+				"type": "string"
 			}
 		},
 		"variables": {
