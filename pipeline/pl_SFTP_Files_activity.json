@@ -1,5 +1,5 @@
 {
-	"name": "pl_SFTP_activity",
+	"name": "pl_SFTP_Files_activity",
 	"properties": {
 		"description": "https://learn.microsoft.com/en-us/azure/data-factory/concepts-nested-activities",
 		"activities": [
