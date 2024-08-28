@@ -70,10 +70,6 @@
 										"p_ds_subFolder": {
 											"value": "@pipeline().parameters.p_SubFolder",
 											"type": "Expression"
-										},
-										"p_ds_FileName": {
-											"value": "@variables('v_Filename')",
-											"type": "Expression"
 										}
 									}
 								}

@@ -1,5 +1,5 @@
 {
-	"name": "ds_sftp_SalesProject_Sub_Folder",
+	"name": "ds_sftp_SalesProject_Files",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "ls_SftpStorage",
@@ -7,6 +7,9 @@
 		},
 		"parameters": {
 			"p_ds_subFolder": {
+				"type": "string"
+			},
+			"p_ds_FileName": {
 				"type": "string"
 			}
 		},
@@ -18,6 +21,10 @@
 		"typeProperties": {
 			"location": {
 				"type": "SftpLocation",
+				"fileName": {
+					"value": "@dataset().p_ds_FileName",
+					"type": "Expression"
+				},
 				"folderPath": {
 					"value": "@concat('SalesProject','/',dataset().p_ds_subFolder)",
 					"type": "Expression"
