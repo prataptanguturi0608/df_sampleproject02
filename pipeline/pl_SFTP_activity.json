@@ -62,16 +62,11 @@
 							},
 							"userProperties": [],
 							"typeProperties": {
-								"variableName": "pipelineReturnValue",
-								"value": [
-									{
-										"key": "v_SubFolder",
-										"value": {
-											"type": "String"
-										}
-									}
-								],
-								"setSystemVariable": true
+								"variableName": "v_name",
+								"value": {
+									"value": "@item().name",
+									"type": "Expression"
+								}
 							}
 						}
 					]
