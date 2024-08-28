@@ -5,6 +5,14 @@
 			"referenceName": "ls_AzureBlobStorageArchive",
 			"type": "LinkedServiceReference"
 		},
+		"parameters": {
+			"p_ds_subFolder": {
+				"type": "string"
+			},
+			"p_ds_FileName": {
+				"type": "string"
+			}
+		},
 		"folder": {
 			"name": "ADF_sampleproject02/ds_SFTP to Archive"
 		},
