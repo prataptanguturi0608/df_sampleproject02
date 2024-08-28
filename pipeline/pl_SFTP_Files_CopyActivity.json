@@ -140,6 +140,11 @@
 				}
 			}
 		],
+		"parameters": {
+			"p_FilesList": {
+				"type": "array"
+			}
+		},
 		"variables": {
 			"v_Filename": {
 				"type": "String"
