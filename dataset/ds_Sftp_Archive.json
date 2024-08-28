@@ -18,6 +18,10 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
+				"folderPath": {
+					"value": "@dataset().p_ds_subFolder",
+					"type": "Expression"
+				},
 				"container": "project02-archive"
 			},
 			"columnDelimiter": ",",
