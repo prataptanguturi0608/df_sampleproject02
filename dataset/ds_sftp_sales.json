@@ -18,7 +18,10 @@
 		"typeProperties": {
 			"location": {
 				"type": "SftpLocation",
-				"folderPath": "/SalesProject/sales"
+				"folderPath": {
+					"value": "SalesProject/sales",
+					"type": "Expression"
+				}
 			},
 			"columnDelimiter": ",",
 			"escapeChar": "\\",
