@@ -37,11 +37,6 @@
 				}
 			}
 		],
-		"variables": {
-			"v_FolderName": {
-				"type": "String"
-			}
-		},
 		"folder": {
 			"name": "ADF_SampleProject02"
 		},
