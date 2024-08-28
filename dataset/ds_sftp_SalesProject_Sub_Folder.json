@@ -22,7 +22,7 @@
 			"location": {
 				"type": "SftpLocation",
 				"folderPath": {
-					"value": "@concat('SalesProject','/',dataset().p_subFolder)",
+					"value": "@concat('SalesProject','/',dataset().p_ds_subFolder)",
 					"type": "Expression"
 				}
 			},
