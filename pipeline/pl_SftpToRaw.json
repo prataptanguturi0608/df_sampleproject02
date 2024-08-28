@@ -109,6 +109,35 @@
 									"type": "DelimitedTextReadSettings"
 								}
 							}
+						},
+						{
+							"name": "Execute Pipeline1",
+							"type": "ExecutePipeline",
+							"dependsOn": [
+								{
+									"activity": "GetFilesList",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "pl_Sftp_copy",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"list_FileNames": {
+										"value": "@activity('GetFilesList').output.childItems",
+										"type": "Expression"
+									}
+								}
+							}
 						}
 					]
 				}
@@ -116,6 +145,9 @@
 		],
 		"variables": {
 			"v_subFolder": {
+				"type": "String"
+			},
+			"v_FileName": {
 				"type": "String"
 			}
 		},

@@ -1,0 +1,61 @@
+{
+	"name": "pl_Sftp_copy",
+	"properties": {
+		"activities": [
+			{
+				"name": "ForEach1",
+				"type": "ForEach",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@pipeline().parameters.list_FileNames",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "Set variable1",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "v_FileName",
+								"value": {
+									"value": "@item().name",
+									"type": "Expression"
+								}
+							}
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"list_FileNames": {
+				"type": "array"
+			}
+		},
+		"variables": {
+			"v_filename": {
+				"type": "String"
+			},
+			"v_subFolder": {
+				"type": "String"
+			},
+			"v_FileName": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "ADF_SampleProject02"
+		},
+		"annotations": [],
+		"lastPublishTime": "2024-08-28T11:24:03Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}
