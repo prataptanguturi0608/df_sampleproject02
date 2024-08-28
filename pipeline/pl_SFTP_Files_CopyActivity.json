@@ -18,6 +18,8 @@
 						{
 							"name": "Copy data1",
 							"type": "Copy",
+							"state": "Inactive",
+							"onInactiveMarkAs": "Succeeded",
 							"dependsOn": [
 								{
 									"activity": "Set variable1",
@@ -97,7 +99,7 @@
 							"type": "SetVariable",
 							"dependsOn": [
 								{
-									"activity": "Set variable1_copy1",
+									"activity": "Set Folderpath",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -117,7 +119,7 @@
 							}
 						},
 						{
-							"name": "Set variable1_copy1",
+							"name": "Set Folderpath",
 							"type": "SetVariable",
 							"dependsOn": [],
 							"policy": {
@@ -128,7 +130,7 @@
 							"typeProperties": {
 								"variableName": "v_subFolder",
 								"value": {
-									"value": "@pipeline().parameters.p_SubFolder",
+									"value": "@concat('SalesProject','/',pipeline().parameters.p_SubFolder)",
 									"type": "Expression"
 								}
 							}
