@@ -64,11 +64,15 @@
 							},
 							"inputs": [
 								{
-									"referenceName": "ds_sftp_SalesProject_Sub_Folder",
+									"referenceName": "ds_sftp_SalesProject_Files",
 									"type": "DatasetReference",
 									"parameters": {
 										"p_ds_subFolder": {
-											"value": "@pipeline().parameters.p_SubFolder",
+											"value": "@concat('SalesProject','/',pipeline().parameters.p_SubFolder)",
+											"type": "Expression"
+										},
+										"p_ds_FileName": {
+											"value": "@item().name",
 											"type": "Expression"
 										}
 									}
