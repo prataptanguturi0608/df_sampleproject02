@@ -3,9 +3,8 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "CopySalesData",
-				"description": "Copying Sales data files from SFTP to Bronze(ADLS)",
-				"type": "Copy",
+				"name": "Get Metadata1",
+				"type": "GetMetadata",
 				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
@@ -16,178 +15,29 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"source": {
-						"type": "DelimitedTextSource",
-						"storeSettings": {
-							"type": "SftpReadSettings",
-							"recursive": true,
-							"wildcardFolderPath": "SalesProject/sales",
-							"wildcardFileName": {
-								"value": "@item().name",
-								"type": "Expression"
-							},
-							"enablePartitionDiscovery": false,
-							"disableChunking": false
-						},
-						"formatSettings": {
-							"type": "DelimitedTextReadSettings"
-						}
-					},
-					"sink": {
-						"type": "DelimitedTextSink",
-						"storeSettings": {
-							"type": "AzureBlobFSWriteSettings",
-							"copyBehavior": "PreserveHierarchy"
-						},
-						"formatSettings": {
-							"type": "DelimitedTextWriteSettings",
-							"quoteAllText": true,
-							"fileExtension": ".txt"
-						}
-					},
-					"enableStaging": false,
-					"translator": {
-						"type": "TabularTranslator",
-						"typeConversion": true,
-						"typeConversionSettings": {
-							"allowDataTruncation": true,
-							"treatBooleanAsNumber": false
-						}
-					}
-				},
-				"inputs": [
-					{
-						"referenceName": "ds_sftp_sales",
-						"type": "DatasetReference"
-					}
-				],
-				"outputs": [
-					{
-						"referenceName": "ds_Sftp_bronze",
-						"type": "DatasetReference"
-					}
-				]
-			},
-			{
-				"name": "ArchivingSalesData",
-				"description": "Archiving Sales data files to Archive folder",
-				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "CopySalesData",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"source": {
-						"type": "DelimitedTextSource",
-						"storeSettings": {
-							"type": "SftpReadSettings",
-							"recursive": true,
-							"wildcardFolderPath": {
-								"value": "SalesProject/sales",
-								"type": "Expression"
-							},
-							"wildcardFileName": {
-								"value": "@item().name",
-								"type": "Expression"
-							},
-							"enablePartitionDiscovery": false,
-							"disableChunking": false
-						},
-						"formatSettings": {
-							"type": "DelimitedTextReadSettings"
-						}
-					},
-					"sink": {
-						"type": "DelimitedTextSink",
-						"storeSettings": {
-							"type": "AzureBlobStorageWriteSettings",
-							"copyBehavior": "PreserveHierarchy"
-						},
-						"formatSettings": {
-							"type": "DelimitedTextWriteSettings",
-							"quoteAllText": true,
-							"fileExtension": ".txt"
-						}
-					},
-					"enableStaging": false,
-					"translator": {
-						"type": "TabularTranslator",
-						"typeConversion": true,
-						"typeConversionSettings": {
-							"allowDataTruncation": true,
-							"treatBooleanAsNumber": false
-						}
-					}
-				},
-				"inputs": [
-					{
-						"referenceName": "ds_sftp_sales",
-						"type": "DatasetReference"
-					}
-				],
-				"outputs": [
-					{
-						"referenceName": "ds_Sftp_Archive",
-						"type": "DatasetReference"
-					}
-				]
-			},
-			{
-				"name": "DeletingSalesData",
-				"description": "Deleting Sales Data files from SFTP",
-				"type": "Delete",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
-				"dependsOn": [
-					{
-						"activity": "ArchivingSalesData",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
 					"dataset": {
-						"referenceName": "ds_sftp_sales",
+						"referenceName": "ds_sftp_products",
 						"type": "DatasetReference"
 					},
-					"logStorageSettings": {
-						"linkedServiceName": {
-							"referenceName": "ls_AzureBlobStorageArchive",
-							"type": "LinkedServiceReference"
-						},
-						"path": "project02-activitylog"
-					},
-					"enableLogging": true,
+					"fieldList": [
+						"childItems"
+					],
 					"storeSettings": {
 						"type": "SftpReadSettings",
-						"recursive": true,
 						"enablePartitionDiscovery": false,
 						"disableChunking": false
+					},
+					"formatSettings": {
+						"type": "DelimitedTextReadSettings"
 					}
 				}
 			}
 		],
+		"variables": {
+			"v_FolderName": {
+				"type": "String"
+			}
+		},
 		"folder": {
 			"name": "ADF_SampleProject02"
 		},
