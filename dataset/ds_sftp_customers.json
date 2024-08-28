@@ -1,0 +1,22 @@
+{
+	"name": "ds_sftp_customers",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_SftpStorage",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "SftpLocation",
+				"folderPath": "/SalesProject/customers"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	}
+}
