@@ -8,9 +8,6 @@
 		"parameters": {
 			"p_ds_subFolder": {
 				"type": "string"
-			},
-			"p_ds_FileName": {
-				"type": "string"
 			}
 		},
 		"folder": {
