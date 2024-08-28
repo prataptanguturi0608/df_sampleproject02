@@ -20,7 +20,7 @@
 				],
 				"typeProperties": {
 					"dataset": {
-						"referenceName": "ds_sftp_products",
+						"referenceName": "ds_sftp_products_Folder",
 						"type": "DatasetReference"
 					},
 					"fieldList": [
