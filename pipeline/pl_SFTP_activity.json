@@ -62,7 +62,7 @@
 							},
 							"userProperties": [],
 							"typeProperties": {
-								"variableName": "v_name",
+								"variableName": "v_Filename",
 								"value": {
 									"value": "@item().name",
 									"type": "Expression"
@@ -97,7 +97,7 @@
 			}
 		],
 		"variables": {
-			"v_name": {
+			"v_Filename": {
 				"type": "String"
 			},
 			"v_subFolder": {
