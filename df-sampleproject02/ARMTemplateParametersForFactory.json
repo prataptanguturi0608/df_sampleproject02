@@ -4,6 +4,45 @@
 	"parameters": {
 		"factoryName": {
 			"value": "df-sampleproject02"
+		},
+		"ls_DLakeStorage_servicePrincipalCredential": {
+			"value": ""
+		},
+		"ls_SftpStorage_password": {
+			"value": ""
+		},
+		"ls_AzureSqlDatabase_password": {
+			"value": ""
+		},
+		"ls_AzureBlobStorageArchive_connectionString": {
+			"value": ""
+		},
+		"ls_AzureKeyVault_properties_typeProperties_baseUrl": {
+			"value": "https://akv-adeuser0608.vault.azure.net/"
+		},
+		"ls_DLakeStorage_properties_typeProperties_url": {
+			"value": "https://dlakeadf.dfs.core.windows.net/"
+		},
+		"ls_DLakeStorage_properties_typeProperties_tenant": {
+			"value": "0320f3ce-af6b-4b19-80da-d948d9d67a09"
+		},
+		"ls_DLakeStorage_properties_typeProperties_servicePrincipalId": {
+			"value": "22de1254-05fc-4ee8-9962-ee09ec1f4096"
+		},
+		"ls_SftpStorage_properties_typeProperties_host": {
+			"value": "eu-central-1.sftpcloud.io"
+		},
+		"ls_SftpStorage_properties_typeProperties_userName": {
+			"value": "63385e91a1a04da3adeae21e3b543d17"
+		},
+		"ls_AzureSqlDatabase_properties_typeProperties_server": {
+			"value": "mfsdbserv01.database.windows.net"
+		},
+		"ls_AzureSqlDatabase_properties_typeProperties_database": {
+			"value": "SampleProject01"
+		},
+		"ls_AzureSqlDatabase_properties_typeProperties_userName": {
+			"value": "sa-admin"
 		}
 	}
 }
