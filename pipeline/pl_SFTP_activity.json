@@ -94,7 +94,7 @@
 									"type": "DatasetReference",
 									"parameters": {
 										"p_SubFolder": {
-											"value": "@variables('v_subFolder')",
+											"value": "@concat('CustomerOrders','/',variables('v_subFolder'))",
 											"type": "Expression"
 										}
 									}
