@@ -5,11 +5,6 @@
 			"referenceName": "ls_SftpStorage",
 			"type": "LinkedServiceReference"
 		},
-		"parameters": {
-			"p_FileName": {
-				"type": "string"
-			}
-		},
 		"folder": {
 			"name": "ADF_sampleproject02/ds_SFTP to Bronze"
 		},
