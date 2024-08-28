@@ -12,7 +12,8 @@
 		"type": "DelimitedText",
 		"typeProperties": {
 			"location": {
-				"type": "SftpLocation"
+				"type": "SftpLocation",
+				"folderPath": "/SalesProject"
 			},
 			"columnDelimiter": ",",
 			"escapeChar": "\\",
