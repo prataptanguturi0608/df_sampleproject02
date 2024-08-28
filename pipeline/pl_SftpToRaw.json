@@ -24,6 +24,7 @@
 					],
 					"storeSettings": {
 						"type": "SftpReadSettings",
+						"recursive": true,
 						"enablePartitionDiscovery": false,
 						"disableChunking": false
 					},
@@ -300,6 +301,8 @@
 		"folder": {
 			"name": "ADF_SampleProject02"
 		},
-		"annotations": []
-	}
+		"annotations": [],
+		"lastPublishTime": "2024-08-28T11:24:03Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
 }
