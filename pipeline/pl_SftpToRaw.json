@@ -3,7 +3,7 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "SFTP_FileList",
+				"name": "SFTP_SalesFileList",
 				"type": "GetMetadata",
 				"dependsOn": [],
 				"policy": {
@@ -37,7 +37,7 @@
 				"type": "ForEach",
 				"dependsOn": [
 					{
-						"activity": "SFTP_FileList",
+						"activity": "SFTP_SalesFileList",
 						"dependencyConditions": [
 							"Succeeded"
 						]
