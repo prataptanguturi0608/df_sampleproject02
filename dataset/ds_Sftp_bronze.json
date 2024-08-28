@@ -1,8 +1,8 @@
 {
-	"name": "ds_sftp_sales",
+	"name": "ds_Sftp_bronze",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "ls_SftpStorage",
+			"referenceName": "ls_DLakeStorage",
 			"type": "LinkedServiceReference"
 		},
 		"folder": {
@@ -12,8 +12,8 @@
 		"type": "DelimitedText",
 		"typeProperties": {
 			"location": {
-				"type": "SftpLocation",
-				"folderPath": "/SalesProject/sales"
+				"type": "AzureBlobFSLocation",
+				"fileSystem": "project02-bronze"
 			},
 			"columnDelimiter": ",",
 			"escapeChar": "\\",

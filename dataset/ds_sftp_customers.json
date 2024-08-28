@@ -5,6 +5,9 @@
 			"referenceName": "ls_SftpStorage",
 			"type": "LinkedServiceReference"
 		},
+		"folder": {
+			"name": "ADF_sampleproject02/ds_SFTP to Bronze"
+		},
 		"annotations": [],
 		"type": "DelimitedText",
 		"typeProperties": {
