@@ -256,7 +256,8 @@
 							},
 							"userProperties": [
 								{
-									"name": "p_folderName"
+									"name": "p_folderName",
+									"value": "v_FolderName"
 								}
 							],
 							"typeProperties": {
