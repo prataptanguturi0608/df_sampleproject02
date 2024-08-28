@@ -1,0 +1,249 @@
+{
+	"name": "pl_SFTP_Files_CopyActivity",
+	"properties": {
+		"description": "https://learn.microsoft.com/en-us/azure/data-factory/concepts-nested-activities",
+		"activities": [
+			{
+				"name": "ForEach1",
+				"type": "ForEach",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@pipeline().parameters.p_FilesList",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "CopyFiles",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "DelimitedTextSource",
+									"storeSettings": {
+										"type": "SftpReadSettings",
+										"recursive": true,
+										"enablePartitionDiscovery": false,
+										"disableChunking": false
+									},
+									"formatSettings": {
+										"type": "DelimitedTextReadSettings"
+									}
+								},
+								"sink": {
+									"type": "DelimitedTextSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings",
+										"copyBehavior": "PreserveHierarchy"
+									},
+									"formatSettings": {
+										"type": "DelimitedTextWriteSettings",
+										"quoteAllText": true,
+										"fileExtension": ".txt"
+									}
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "ds_sftp_SalesProject_Files",
+									"type": "DatasetReference",
+									"parameters": {
+										"p_ds_subFolder": {
+											"value": "@concat('SalesProject','/',pipeline().parameters.p_SubFolder)",
+											"type": "Expression"
+										},
+										"p_ds_FileName": {
+											"value": "@item().name",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "ds_Sftp_bronze",
+									"type": "DatasetReference",
+									"parameters": {
+										"p_ds_SubFolder": {
+											"value": "@pipeline().parameters.p_SubFolder",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						},
+						{
+							"name": "ArchiveFiles",
+							"type": "Copy",
+							"dependsOn": [
+								{
+									"activity": "CopyFiles",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "DelimitedTextSource",
+									"storeSettings": {
+										"type": "SftpReadSettings",
+										"recursive": true,
+										"enablePartitionDiscovery": false,
+										"disableChunking": false
+									},
+									"formatSettings": {
+										"type": "DelimitedTextReadSettings"
+									}
+								},
+								"sink": {
+									"type": "DelimitedTextSink",
+									"storeSettings": {
+										"type": "AzureBlobStorageWriteSettings"
+									},
+									"formatSettings": {
+										"type": "DelimitedTextWriteSettings",
+										"quoteAllText": true,
+										"fileExtension": ".txt"
+									}
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "ds_sftp_SalesProject_Files",
+									"type": "DatasetReference",
+									"parameters": {
+										"p_ds_subFolder": {
+											"value": "@concat('SalesProject','/',pipeline().parameters.p_SubFolder)",
+											"type": "Expression"
+										},
+										"p_ds_FileName": {
+											"value": "@item().name",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "ds_Sftp_Archive",
+									"type": "DatasetReference",
+									"parameters": {
+										"p_ds_subFolder": {
+											"value": "@concat('SalesProject','/',pipeline().parameters.p_SubFolder,'/',formatDateTime(utcNow(),'yyyy'),'/',formatDateTime(utcNow(),'MM'),'/',formatDateTime(utcNow(),'dd'))\n",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						},
+						{
+							"name": "Delete1",
+							"type": "Delete",
+							"state": "Inactive",
+							"onInactiveMarkAs": "Succeeded",
+							"dependsOn": [
+								{
+									"activity": "ArchiveFiles",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"dataset": {
+									"referenceName": "ds_sftp_SalesProject_Files",
+									"type": "DatasetReference",
+									"parameters": {
+										"p_ds_subFolder": "@concat('SalesProject','/',pipeline().parameters.p_SubFolder)",
+										"p_ds_FileName": "@item().name"
+									}
+								},
+								"logStorageSettings": {
+									"linkedServiceName": {
+										"referenceName": "ls_AzureBlobStorageArchive",
+										"type": "LinkedServiceReference"
+									},
+									"path": "project02-activitylog"
+								},
+								"enableLogging": true,
+								"storeSettings": {
+									"type": "SftpReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false,
+									"disableChunking": false
+								}
+							}
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"p_FilesList": {
+				"type": "array"
+			},
+			"p_SubFolder": {
+				"type": "string"
+			}
+		},
+		"variables": {
+			"v_Filename": {
+				"type": "String"
+			},
+			"v_subFolder": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "ADF_SampleProject02"
+		},
+		"annotations": [],
+		"lastPublishTime": "2024-08-28T11:24:03Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

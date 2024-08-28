@@ -1,0 +1,35 @@
+{
+	"name": "ds_Sftp_bronze",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_DLakeStorage",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"p_ds_SubFolder": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "ADF_sampleproject02/ds_SFTP to Bronze"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": {
+					"value": "@dataset().p_ds_SubFolder",
+					"type": "Expression"
+				},
+				"fileSystem": "project02-bronze"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

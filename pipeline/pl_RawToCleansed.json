@@ -1,0 +1,22 @@
+{
+	"name": "pl_RawToCleansed",
+	"properties": {
+		"activities": [
+			{
+				"name": "Wait1",
+				"type": "Wait",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"waitTimeInSeconds": 1
+				}
+			}
+		],
+		"folder": {
+			"name": "ADF_SampleProject02"
+		},
+		"annotations": [],
+		"lastPublishTime": "2024-08-28T08:07:27Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

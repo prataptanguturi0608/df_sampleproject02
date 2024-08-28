@@ -1,0 +1,34 @@
+{
+	"name": "ds_sftp_SalesProject_Sub_Folder",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_SftpStorage",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"p_ds_subFolder": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "ADF_sampleproject02/ds_SFTP to Bronze"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "SftpLocation",
+				"folderPath": {
+					"value": "@concat('SalesProject','/',dataset().p_ds_subFolder)",
+					"type": "Expression"
+				}
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}
