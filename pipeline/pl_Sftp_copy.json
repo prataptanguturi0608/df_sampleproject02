@@ -41,12 +41,6 @@
 			}
 		},
 		"variables": {
-			"v_filename": {
-				"type": "String"
-			},
-			"v_subFolder": {
-				"type": "String"
-			},
 			"v_FileName": {
 				"type": "String"
 			}
