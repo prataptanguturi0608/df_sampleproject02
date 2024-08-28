@@ -16,10 +16,12 @@
 				"userProperties": [],
 				"typeProperties": {
 					"dataset": {
-						"referenceName": "ds_sftp_sales",
+						"referenceName": "ds_sftp_Folder",
 						"type": "DatasetReference"
 					},
-					"fieldList": [],
+					"fieldList": [
+						"childItems"
+					],
 					"storeSettings": {
 						"type": "SftpReadSettings",
 						"enablePartitionDiscovery": false,

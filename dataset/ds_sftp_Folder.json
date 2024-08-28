@@ -1,5 +1,5 @@
 {
-	"name": "ds_sftp_sales_copy1",
+	"name": "ds_sftp_Folder",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "ls_SftpStorage",
