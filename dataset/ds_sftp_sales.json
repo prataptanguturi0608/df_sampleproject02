@@ -10,7 +10,7 @@
 		"typeProperties": {
 			"location": {
 				"type": "SftpLocation",
-				"folderPath": "/SalesProject"
+				"folderPath": "/SalesProject/sales"
 			},
 			"columnDelimiter": ",",
 			"escapeChar": "\\",

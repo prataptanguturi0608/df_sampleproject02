@@ -1,5 +1,5 @@
 {
-	"name": "ds_sftp_csv",
+	"name": "ds_sftp_products",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "ls_SftpStorage",
@@ -10,7 +10,7 @@
 		"typeProperties": {
 			"location": {
 				"type": "SftpLocation",
-				"folderPath": "/SalesProject"
+				"folderPath": "/SalesProject/products"
 			},
 			"columnDelimiter": ",",
 			"escapeChar": "\\",
