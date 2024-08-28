@@ -5,6 +5,11 @@
 			"referenceName": "ls_DLakeStorage",
 			"type": "LinkedServiceReference"
 		},
+		"parameters": {
+			"p_ds_SubFolder": {
+				"type": "string"
+			}
+		},
 		"folder": {
 			"name": "ADF_sampleproject02/ds_SFTP to Bronze"
 		},
@@ -13,6 +18,10 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
+				"folderPath": {
+					"value": "@dataset().p_ds_SubFolder",
+					"type": "Expression"
+				},
 				"fileSystem": "project02-bronze"
 			},
 			"columnDelimiter": ",",
