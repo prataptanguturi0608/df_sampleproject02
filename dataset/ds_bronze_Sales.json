@@ -23,15 +23,27 @@
 		},
 		"schema": [
 			{
-				"name": "productid",
+				"name": "SaleID",
 				"type": "String"
 			},
 			{
-				"name": "productname",
+				"name": "CustomerID",
 				"type": "String"
 			},
 			{
-				"name": "productcategory",
+				"name": "ProductID",
+				"type": "String"
+			},
+			{
+				"name": "Quantity",
+				"type": "String"
+			},
+			{
+				"name": "SaleDate",
+				"type": "String"
+			},
+			{
+				"name": "Revenue",
 				"type": "String"
 			}
 		]
