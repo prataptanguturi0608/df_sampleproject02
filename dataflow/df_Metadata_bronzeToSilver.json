@@ -51,7 +51,7 @@
 			],
 			"scriptLines": [
 				"source(output(",
-				"          productid as integer,",
+				"          productid as string,",
 				"          productname as string,",
 				"          productcategory as string",
 				"     ),",

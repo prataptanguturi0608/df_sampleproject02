@@ -18,6 +18,10 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
+				"fileName": {
+					"value": "@dataset().p_ds_fileName",
+					"type": "Expression"
+				},
 				"folderPath": "products",
 				"fileSystem": "project02-bronze"
 			},
