@@ -6,33 +6,19 @@
 			"sources": [
 				{
 					"dataset": {
-						"referenceName": "ds_bronze_products",
+						"referenceName": "ds_bronze_Sales",
 						"type": "DatasetReference"
 					},
-					"name": "ProductsDataIn"
-				},
-				{
-					"dataset": {
-						"referenceName": "ds_bronze_Customers",
-						"type": "DatasetReference"
-					},
-					"name": "CustomersDataIn"
+					"name": "SalesDataIn"
 				}
 			],
 			"sinks": [
 				{
 					"dataset": {
-						"referenceName": "ds_AzureSQLDB_ProductsTBL",
+						"referenceName": "ds_AzureSQLDB_SalesTBL",
 						"type": "DatasetReference"
 					},
-					"name": "ProductsDataLoadtoAzureSQL"
-				},
-				{
-					"dataset": {
-						"referenceName": "ds_AzureSQLDB_CustomersTBL",
-						"type": "DatasetReference"
-					},
-					"name": "CustomersDataLoadtoAzureSQL"
+					"name": "SalesDataLoadtoAzureSQL"
 				}
 			],
 			"transformations": [
@@ -40,73 +26,39 @@
 					"name": "aggregate1"
 				},
 				{
-					"name": "aggregate2"
-				},
-				{
 					"name": "select1"
-				},
-				{
-					"name": "select2"
 				}
 			],
 			"scriptLines": [
 				"source(output(",
-				"          productid as string,",
-				"          productname as string,",
-				"          productcategory as string",
+				"          SaleID as short,",
+				"          CustomerID as short,",
+				"          ProductID as short,",
+				"          Quantity as short,",
+				"          SaleDate as date,",
+				"          Revenue as double",
 				"     ),",
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
-				"     ignoreNoFilesFound: false) ~> ProductsDataIn",
-				"source(output(",
-				"          CustomerID as integer,",
-				"          {First Name} as string,",
-				"          {Last Name} as string,",
-				"          Gender as string",
-				"     ),",
-				"     allowSchemaDrift: true,",
-				"     validateSchema: false,",
-				"     ignoreNoFilesFound: false) ~> CustomersDataIn",
-				"ProductsDataIn aggregate(groupBy(productid,",
-				"          productname,",
-				"          productcategory),",
+				"     ignoreNoFilesFound: false) ~> SalesDataIn",
+				"SalesDataIn aggregate(groupBy(SaleID,",
+				"          CustomerID,",
+				"          ProductID,",
+				"          Quantity,",
+				"          SaleDate,",
+				"          Revenue),",
 				"     count = count()) ~> aggregate1",
-				"CustomersDataIn aggregate(groupBy(CustomerID,",
-				"          {First Name},",
-				"          {Last Name},",
-				"          Gender),",
-				"     count = count()) ~> aggregate2",
 				"aggregate1 select(mapColumn(",
-				"          productid,",
-				"          productname,",
-				"          productcategory",
+				"          SaleID,",
+				"          CustomerID,",
+				"          ProductID,",
+				"          Quantity,",
+				"          SaleDate,",
+				"          Revenue",
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> select1",
-				"aggregate2 select(mapColumn(",
-				"          CustomerID,",
-				"          {First Name},",
-				"          {Last Name},",
-				"          Gender",
-				"     ),",
-				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> select2",
 				"select1 sink(allowSchemaDrift: true,",
-				"     validateSchema: false,",
-				"     deletable:false,",
-				"     insertable:true,",
-				"     updateable:false,",
-				"     upsertable:false,",
-				"     format: 'table',",
-				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true,",
-				"     errorHandlingOption: 'stopOnFirstError',",
-				"     mapColumn(",
-				"          productid,",
-				"          productname,",
-				"          productcategory",
-				"     )) ~> ProductsDataLoadtoAzureSQL",
-				"select2 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
 				"          CustomerID as integer,",
@@ -123,11 +75,10 @@
 				"     skipDuplicateMapOutputs: true,",
 				"     errorHandlingOption: 'stopOnFirstError',",
 				"     mapColumn(",
-				"          CustomerID,",
-				"          {First Name},",
-				"          {Last Name},",
-				"          Gender",
-				"     )) ~> CustomersDataLoadtoAzureSQL"
+				"          productid,",
+				"          productname,",
+				"          productcategory",
+				"     )) ~> SalesDataLoadtoAzureSQL"
 			]
 		}
 	}
