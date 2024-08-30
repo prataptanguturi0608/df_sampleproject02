@@ -1,0 +1,39 @@
+{
+	"name": "ds_P2_bronze_products",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_DLakeStorage",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "ADF_sampleproject02/ds_BronzeTOSilver"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": "products",
+				"fileSystem": "project02-bronze"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "productid",
+				"type": "String"
+			},
+			{
+				"name": "productname",
+				"type": "String"
+			},
+			{
+				"name": "productcategory",
+				"type": "String"
+			}
+		]
+	}
+}
