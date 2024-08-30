@@ -1,0 +1,117 @@
+{
+	"name": "df_Metadata_bronzeToSilver",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_bronze_products",
+						"type": "DatasetReference"
+					},
+					"name": "ProductsDataIn"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_bronze_Customers",
+						"type": "DatasetReference"
+					},
+					"name": "CustomersDataIn"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_AzureSQLDB",
+						"type": "DatasetReference"
+					},
+					"name": "DataLoadtoAzureSQL"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_AzureSQLDB",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "aggregate1"
+				},
+				{
+					"name": "aggregate2"
+				},
+				{
+					"name": "select1"
+				},
+				{
+					"name": "select2"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          productid as integer,",
+				"          productname as string,",
+				"          productcategory as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> ProductsDataIn",
+				"source(output(",
+				"          CustomerID as integer,",
+				"          {First Name} as string,",
+				"          {Last Name} as string,",
+				"          Gender as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> CustomersDataIn",
+				"ProductsDataIn aggregate(groupBy(productid,",
+				"          productname,",
+				"          productcategory),",
+				"     count = count()) ~> aggregate1",
+				"CustomersDataIn aggregate(groupBy(CustomerID,",
+				"          {First Name},",
+				"          {Last Name},",
+				"          Gender),",
+				"     count = count()) ~> aggregate2",
+				"aggregate1 select(mapColumn(",
+				"          productid,",
+				"          productname,",
+				"          productcategory",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"aggregate2 select(mapColumn(",
+				"          CustomerID,",
+				"          {First Name},",
+				"          {Last Name},",
+				"          Gender",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select2",
+				"select1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> DataLoadtoAzureSQL",
+				"select2 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
+			]
+		}
+	}
+}
