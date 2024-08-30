@@ -39,7 +39,7 @@
 			"value": "SampleProject01"
 		},
 		"ls_AzureSqlDatabase_properties_typeProperties_userName": {
-			"value": "sa-admin"
+			"value": "sa-airbus"
 		},
 		"ls_DLakeStorage_properties_typeProperties_url": {
 			"value": "https://dlakeadf.dfs.core.windows.net/"

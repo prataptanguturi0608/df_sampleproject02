@@ -53,7 +53,7 @@
 		},
 		"ls_AzureSqlDatabase_properties_typeProperties_userName": {
 			"type": "string",
-			"defaultValue": "sa-admin"
+			"defaultValue": "sa-airbus"
 		},
 		"ls_DLakeStorage_properties_typeProperties_url": {
 			"type": "string",
@@ -114,12 +114,132 @@
 			"properties": {
 				"activities": [
 					{
-						"name": "Wait1",
-						"type": "Wait",
+						"name": "df_Metadata_bronzeToSilver_MDM",
+						"type": "ExecuteDataFlow",
 						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
 						"userProperties": [],
 						"typeProperties": {
-							"waitTimeInSeconds": 1
+							"dataflow": {
+								"referenceName": "df_Metadata_bronzeToSilver_MDM",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"ProductsDataIn": {},
+									"CustomersDataIn": {},
+									"ProductsDataSink": {},
+									"CustomersDataSink": {},
+									"sink1": {},
+									"sink2": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					},
+					{
+						"name": "SalesData",
+						"type": "GetMetadata",
+						"dependsOn": [
+							{
+								"activity": "df_Metadata_bronzeToSilver_MDM",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataset": {
+								"referenceName": "ds_bronze_Sales",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"fieldList": [
+								"childItems"
+							],
+							"storeSettings": {
+								"type": "AzureBlobFSReadSettings",
+								"recursive": true,
+								"enablePartitionDiscovery": false
+							},
+							"formatSettings": {
+								"type": "DelimitedTextReadSettings"
+							}
+						}
+					},
+					{
+						"name": "ForEach1",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "SalesData",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('SalesData').output.childItems",
+								"type": "Expression"
+							},
+							"isSequential": true,
+							"activities": [
+								{
+									"name": "df_Metadata_bronzeToSilver_Sales",
+									"type": "ExecuteDataFlow",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"dataflow": {
+											"referenceName": "df_Metadata_bronzeToSilver_Sales",
+											"type": "DataFlowReference",
+											"parameters": {
+												"p_Sales_FileName": {
+													"value": "'@{item().name}'",
+													"type": "Expression"
+												}
+											},
+											"datasetParameters": {
+												"SalesDataIn": {},
+												"SalesDataLoadtoAzureSQL": {}
+											}
+										},
+										"staging": {},
+										"compute": {
+											"coreCount": 8,
+											"computeType": "General"
+										},
+										"traceLevel": "Fine"
+									}
+								}
+							]
 						}
 					}
 				],
@@ -132,7 +252,11 @@
 				"annotations": [],
 				"lastPublishTime": "2024-08-28T08:07:27Z"
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/df_Metadata_bronzeToSilver_MDM')]",
+				"[concat(variables('factoryId'), '/datasets/ds_bronze_Sales')]",
+				"[concat(variables('factoryId'), '/dataflows/df_Metadata_bronzeToSilver_Sales')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/pl_SFTP_Files_CopyActivity')]",
@@ -394,6 +518,83 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/pl_SP2_master')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "pl_SftpToRaw",
+						"type": "ExecutePipeline",
+						"dependsOn": [],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "pl_SftpToRaw",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "pl_RawToCleansed",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "pl_SftpToRaw",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "pl_RawToCleansed",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "error log",
+						"type": "Wait",
+						"dependsOn": [
+							{
+								"activity": "pl_SftpToRaw",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"waitTimeInSeconds": 1
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "ADF_SampleProject02"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/pl_SftpToRaw')]",
+				"[concat(variables('factoryId'), '/pipelines/pl_RawToCleansed')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/pl_SftpToRaw')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -572,6 +773,126 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/ds_AzureSQLDB_CustomersTBL')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_AzureSqlDatabase",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "ADF_sampleproject02/ds_BronzeTOSilver"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "CustomerID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "First_Name",
+						"type": "varchar"
+					},
+					{
+						"name": "Last_Name",
+						"type": "varchar"
+					},
+					{
+						"name": "Gender",
+						"type": "varchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "tbl_sp2_customers"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_AzureSqlDatabase')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_AzureSQLDB_ProductsTBL')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_AzureSqlDatabase",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "ADF_sampleproject02/ds_BronzeTOSilver"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "tbl_sp2_products"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_AzureSqlDatabase')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_AzureSQLDB_SalesTBL')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_AzureSqlDatabase",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "ADF_sampleproject02/ds_BronzeTOSilver"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "SaleID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "CustomerID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ProductID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "Quantity",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SaleDate",
+						"type": "varchar"
+					},
+					{
+						"name": "Revenue",
+						"type": "float",
+						"precision": 15
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "tbl_sp2_sales"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_AzureSqlDatabase')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/ds_Sftp_Archive')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -644,6 +965,181 @@
 					"quoteChar": "\""
 				},
 				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_DLakeStorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_Silver_Parquet_out')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_DLakeStorage",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "ADF_sampleproject02/ds_BronzeTOSilver"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileSystem": "project02-silver"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_DLakeStorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_bronze_Customers')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_DLakeStorage",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "ADF_sampleproject02/ds_BronzeTOSilver"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "customers",
+						"fileSystem": "project02-bronze"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "CustomerID",
+						"type": "String"
+					},
+					{
+						"name": "First Name",
+						"type": "String"
+					},
+					{
+						"name": "Last Name",
+						"type": "String"
+					},
+					{
+						"name": "Gender",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_DLakeStorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_bronze_Sales')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_DLakeStorage",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "ADF_sampleproject02/ds_BronzeTOSilver"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "sales",
+						"fileSystem": "project02-bronze"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "SaleID",
+						"type": "String"
+					},
+					{
+						"name": "CustomerID",
+						"type": "String"
+					},
+					{
+						"name": "ProductID",
+						"type": "String"
+					},
+					{
+						"name": "Quantity",
+						"type": "String"
+					},
+					{
+						"name": "SaleDate",
+						"type": "String"
+					},
+					{
+						"name": "Revenue",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_DLakeStorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_bronze_products')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_DLakeStorage",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "ADF_sampleproject02/ds_BronzeTOSilver"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "products",
+						"fileSystem": "project02-bronze"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "productid",
+						"type": "String"
+					},
+					{
+						"name": "productname",
+						"type": "String"
+					},
+					{
+						"name": "productcategory",
+						"type": "String"
+					}
+				]
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/ls_DLakeStorage')]"
@@ -872,7 +1368,7 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/df_Metadata_bronzeToSilver')]",
+			"name": "[concat(parameters('factoryName'), '/df_Metadata_bronzeToSilver_MDM')]",
 			"type": "Microsoft.DataFactory/factories/dataflows",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -897,17 +1393,31 @@
 					"sinks": [
 						{
 							"dataset": {
-								"referenceName": "ds_AzureSQLDB",
+								"referenceName": "ds_Silver_Parquet_out",
 								"type": "DatasetReference"
 							},
-							"name": "DataLoadtoAzureSQL"
+							"name": "ProductsDataSink"
 						},
 						{
 							"dataset": {
-								"referenceName": "ds_AzureSQLDB",
+								"referenceName": "ds_Silver_Parquet_out",
+								"type": "DatasetReference"
+							},
+							"name": "CustomersDataSink"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_AzureSQLDB_ProductsTBL",
 								"type": "DatasetReference"
 							},
 							"name": "sink1"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_AzureSQLDB_CustomersTBL",
+								"type": "DatasetReference"
+							},
+							"name": "sink2"
 						}
 					],
 					"transformations": [
@@ -926,7 +1436,7 @@
 					],
 					"scriptLines": [
 						"source(output(",
-						"          productid as integer,",
+						"          productid as string,",
 						"          productname as string,",
 						"          productcategory as string",
 						"     ),",
@@ -968,20 +1478,35 @@
 						"     skipDuplicateMapOutputs: true) ~> select2",
 						"select1 sink(allowSchemaDrift: true,",
 						"     validateSchema: false,",
-						"     deletable:false,",
-						"     insertable:true,",
-						"     updateable:false,",
-						"     upsertable:false,",
-						"     format: 'table',",
+						"     format: 'parquet',",
+						"     partitionFileNames:[('Products_CleansedData.parquet')],",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
 						"     skipDuplicateMapInputs: true,",
 						"     skipDuplicateMapOutputs: true,",
-						"     errorHandlingOption: 'stopOnFirstError',",
 						"     mapColumn(",
 						"          productid,",
 						"          productname,",
 						"          productcategory",
-						"     )) ~> DataLoadtoAzureSQL",
+						"     ),",
+						"     partitionBy('hash', 1)) ~> ProductsDataSink",
 						"select2 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     format: 'parquet',",
+						"     partitionFileNames:['\\'Customers_CleansedData.parquet\\''],",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     mapColumn(",
+						"          CustomerID,",
+						"          First_Name = {First Name},",
+						"          Last_Name = {Last Name},",
+						"          Gender",
+						"     )) ~> CustomersDataSink",
+						"select1 sink(allowSchemaDrift: true,",
 						"     validateSchema: false,",
 						"     deletable:false,",
 						"     insertable:true,",
@@ -990,150 +1515,131 @@
 						"     format: 'table',",
 						"     skipDuplicateMapInputs: true,",
 						"     skipDuplicateMapOutputs: true,",
-						"     errorHandlingOption: 'stopOnFirstError',",
-						"     mapColumn(",
-						"          CustomerID,",
-						"          {First Name},",
-						"          {Last Name},",
-						"          Gender",
-						"     )) ~> sink1"
+						"     errorHandlingOption: 'stopOnFirstError') ~> sink1",
+						"select2 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          CustomerID as integer,",
+						"          First_Name as string,",
+						"          Last_Name as string,",
+						"          Gender as string",
+						"     ),",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError') ~> sink2"
 					]
 				}
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/ds_bronze_products')]",
 				"[concat(variables('factoryId'), '/datasets/ds_bronze_Customers')]",
-				"[concat(variables('factoryId'), '/datasets/ds_AzureSQLDB')]"
+				"[concat(variables('factoryId'), '/datasets/ds_Silver_Parquet_out')]",
+				"[concat(variables('factoryId'), '/datasets/ds_AzureSQLDB_ProductsTBL')]",
+				"[concat(variables('factoryId'), '/datasets/ds_AzureSQLDB_CustomersTBL')]"
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/ds_bronze_products')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
+			"name": "[concat(parameters('factoryName'), '/df_Metadata_bronzeToSilver_Sales')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
 			"apiVersion": "2018-06-01",
 			"properties": {
-				"linkedServiceName": {
-					"referenceName": "ls_DLakeStorage",
-					"type": "LinkedServiceReference"
-				},
-				"folder": {
-					"name": "ADF_sampleproject02/ds_BronzeTOSilver"
-				},
-				"annotations": [],
-				"type": "DelimitedText",
+				"type": "MappingDataFlow",
 				"typeProperties": {
-					"location": {
-						"type": "AzureBlobFSLocation",
-						"folderPath": "products",
-						"fileSystem": "project02-bronze"
-					},
-					"columnDelimiter": ",",
-					"escapeChar": "\\",
-					"firstRowAsHeader": true,
-					"quoteChar": "\""
-				},
-				"schema": [
-					{
-						"name": "productid",
-						"type": "String"
-					},
-					{
-						"name": "productname",
-						"type": "String"
-					},
-					{
-						"name": "productcategory",
-						"type": "String"
-					}
-				]
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/ls_DLakeStorage')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/ds_bronze_Customers')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "ls_DLakeStorage",
-					"type": "LinkedServiceReference"
-				},
-				"folder": {
-					"name": "ADF_sampleproject02/ds_BronzeTOSilver"
-				},
-				"annotations": [],
-				"type": "DelimitedText",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobFSLocation",
-						"folderPath": "customers",
-						"fileSystem": "project02-bronze"
-					},
-					"columnDelimiter": ",",
-					"escapeChar": "\\",
-					"firstRowAsHeader": true,
-					"quoteChar": "\""
-				},
-				"schema": [
-					{
-						"name": "CustomerID",
-						"type": "String"
-					},
-					{
-						"name": "First Name",
-						"type": "String"
-					},
-					{
-						"name": "Last Name",
-						"type": "String"
-					},
-					{
-						"name": "Gender",
-						"type": "String"
-					}
-				]
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/ls_DLakeStorage')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/ds_AzureSQLDB')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "ls_AzureSqlDatabase",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"p_schema": {
-						"type": "string"
-					},
-					"p_TableName": {
-						"type": "string"
-					}
-				},
-				"folder": {
-					"name": "ADF_sampleproject02/ds_BronzeTOSilver"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [],
-				"typeProperties": {
-					"schema": {
-						"value": "@dataset().p_schema",
-						"type": "Expression"
-					},
-					"table": {
-						"value": "@dataset().p_TableName",
-						"type": "Expression"
-					}
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "ds_bronze_Sales",
+								"type": "DatasetReference"
+							},
+							"name": "SalesDataIn"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "ds_AzureSQLDB_SalesTBL",
+								"type": "DatasetReference"
+							},
+							"name": "SalesDataLoadtoAzureSQL"
+						}
+					],
+					"transformations": [
+						{
+							"name": "aggregate1"
+						},
+						{
+							"name": "select1"
+						}
+					],
+					"scriptLines": [
+						"parameters{",
+						"     p_Sales_FileName as string",
+						"}",
+						"source(output(",
+						"          SaleID as integer,",
+						"          CustomerID as integer,",
+						"          ProductID as integer,",
+						"          Quantity as integer,",
+						"          SaleDate as string,",
+						"          Revenue as double",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> SalesDataIn",
+						"SalesDataIn aggregate(groupBy(SaleID,",
+						"          CustomerID,",
+						"          ProductID,",
+						"          Quantity,",
+						"          SaleDate,",
+						"          Revenue),",
+						"     count = count()) ~> aggregate1",
+						"aggregate1 select(mapColumn(",
+						"          SaleID,",
+						"          CustomerID,",
+						"          ProductID,",
+						"          Quantity,",
+						"          SaleDate,",
+						"          Revenue",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select1",
+						"select1 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          SaleID as integer,",
+						"          CustomerID as integer,",
+						"          ProductID as integer,",
+						"          Quantity as integer,",
+						"          SaleDate as string,",
+						"          Revenue as double",
+						"     ),",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError',",
+						"     mapColumn(",
+						"          SaleID,",
+						"          CustomerID,",
+						"          ProductID,",
+						"          Quantity,",
+						"          SaleDate,",
+						"          Revenue",
+						"     )) ~> SalesDataLoadtoAzureSQL"
+					]
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/ls_AzureSqlDatabase')]"
+				"[concat(variables('factoryId'), '/datasets/ds_bronze_Sales')]",
+				"[concat(variables('factoryId'), '/datasets/ds_AzureSQLDB_SalesTBL')]"
 			]
 		}
 	]
