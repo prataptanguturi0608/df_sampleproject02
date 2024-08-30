@@ -70,7 +70,7 @@
 				"          Gender as string",
 				"     ),",
 				"     deletable:false,",
-				"     insertable:true,",
+				"     insertable:false,",
 				"     updateable:false,",
 				"     upsertable:false,",
 				"     format: 'table',",
