@@ -33,6 +33,20 @@
 						"type": "DatasetReference"
 					},
 					"name": "CustomersDataSink"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_AzureSQLDB_ProductsTBL",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_AzureSQLDB_CustomersTBL",
+						"type": "DatasetReference"
+					},
+					"name": "sink2"
 				}
 			],
 			"transformations": [
@@ -120,7 +134,33 @@
 				"          First_Name = {First Name},",
 				"          Last_Name = {Last Name},",
 				"          Gender",
-				"     )) ~> CustomersDataSink"
+				"     )) ~> CustomersDataSink",
+				"select1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sink1",
+				"select2 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          CustomerID as integer,",
+				"          First_Name as string,",
+				"          Last_Name as string,",
+				"          Gender as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sink2"
 			]
 		}
 	}
