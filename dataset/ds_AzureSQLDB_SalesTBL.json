@@ -12,22 +12,38 @@
 		"type": "AzureSqlTable",
 		"schema": [
 			{
+				"name": "SaleID",
+				"type": "int",
+				"precision": 10
+			},
+			{
 				"name": "CustomerID",
 				"type": "int",
 				"precision": 10
 			},
 			{
-				"name": "First_Name",
+				"name": "ProductID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Quantity",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "SaleDate",
 				"type": "varchar"
 			},
 			{
-				"name": "Last_Name",
-				"type": "varchar"
-			},
-			{
-				"name": "Gender",
-				"type": "varchar"
+				"name": "Revenue",
+				"type": "float",
+				"precision": 15
 			}
-		]
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "tbl_sp2_sales"
+		}
 	}
 }
