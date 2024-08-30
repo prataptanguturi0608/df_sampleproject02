@@ -1,0 +1,23 @@
+{
+	"name": "ds_AzureSQLDB",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_AzureSqlDatabase",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"p_schema": {
+				"type": "string"
+			},
+			"p_TableName": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "ADF_sampleproject02/ds_BronzeTOSilver"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": []
+	}
+}
