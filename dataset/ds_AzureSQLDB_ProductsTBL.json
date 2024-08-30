@@ -1,5 +1,5 @@
 {
-	"name": "ds_AzureSQLDB",
+	"name": "ds_AzureSQLDB_ProductsTBL",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "ls_AzureSqlDatabase",
@@ -20,14 +20,8 @@
 		"type": "AzureSqlTable",
 		"schema": [],
 		"typeProperties": {
-			"schema": {
-				"value": "@dataset().p_schema",
-				"type": "Expression"
-			},
-			"table": {
-				"value": "@dataset().p_TableName",
-				"type": "Expression"
-			}
+			"schema": "dbo",
+			"table": "tbl_sp2_products"
 		}
 	}
 }
