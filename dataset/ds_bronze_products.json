@@ -5,11 +5,6 @@
 			"referenceName": "ls_DLakeStorage",
 			"type": "LinkedServiceReference"
 		},
-		"parameters": {
-			"p_ds_fileName": {
-				"type": "string"
-			}
-		},
 		"folder": {
 			"name": "ADF_sampleproject02/ds_BronzeTOSilver"
 		},
@@ -18,10 +13,6 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"fileName": {
-					"value": "@dataset().p_ds_fileName",
-					"type": "Expression"
-				},
 				"folderPath": "products",
 				"fileSystem": "project02-bronze"
 			},
