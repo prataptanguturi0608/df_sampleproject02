@@ -22,14 +22,14 @@
 			"sinks": [
 				{
 					"dataset": {
-						"referenceName": "ds_AzureSQLDB",
+						"referenceName": "ds_AzureSQLDB_ProductsTBL",
 						"type": "DatasetReference"
 					},
 					"name": "ProductsDataLoadtoAzureSQL"
 				},
 				{
 					"dataset": {
-						"referenceName": "ds_AzureSQLDB",
+						"referenceName": "ds_AzureSQLDB_CustomersTBL",
 						"type": "DatasetReference"
 					},
 					"name": "CustomersDataLoadtoAzureSQL"
@@ -108,6 +108,12 @@
 				"     )) ~> ProductsDataLoadtoAzureSQL",
 				"select2 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
+				"     input(",
+				"          CustomerID as integer,",
+				"          First_Name as string,",
+				"          Last_Name as string,",
+				"          Gender as string",
+				"     ),",
 				"     deletable:false,",
 				"     insertable:true,",
 				"     updateable:false,",
