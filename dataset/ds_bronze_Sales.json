@@ -5,11 +5,6 @@
 			"referenceName": "ls_DLakeStorage",
 			"type": "LinkedServiceReference"
 		},
-		"parameters": {
-			"p_ds_sales_fileName": {
-				"type": "String"
-			}
-		},
 		"folder": {
 			"name": "ADF_sampleproject02/ds_BronzeTOSilver"
 		},
