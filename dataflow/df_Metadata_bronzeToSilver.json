@@ -25,14 +25,14 @@
 						"referenceName": "ds_AzureSQLDB",
 						"type": "DatasetReference"
 					},
-					"name": "DataLoadtoAzureSQL"
+					"name": "ProductsDataLoadtoAzureSQL"
 				},
 				{
 					"dataset": {
 						"referenceName": "ds_AzureSQLDB",
 						"type": "DatasetReference"
 					},
-					"name": "sink1"
+					"name": "CustomersDataLoadtoAzureSQL"
 				}
 			],
 			"transformations": [
@@ -105,7 +105,7 @@
 				"          productid,",
 				"          productname,",
 				"          productcategory",
-				"     )) ~> DataLoadtoAzureSQL",
+				"     )) ~> ProductsDataLoadtoAzureSQL",
 				"select2 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     deletable:false,",
@@ -121,7 +121,7 @@
 				"          {First Name},",
 				"          {Last Name},",
 				"          Gender",
-				"     )) ~> sink1"
+				"     )) ~> CustomersDataLoadtoAzureSQL"
 			]
 		}
 	}
