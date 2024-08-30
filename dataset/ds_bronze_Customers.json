@@ -13,7 +13,7 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"folderPath": "Customers",
+				"folderPath": "customers",
 				"fileSystem": "project02-bronze"
 			},
 			"columnDelimiter": ",",
@@ -21,19 +21,6 @@
 			"firstRowAsHeader": true,
 			"quoteChar": "\""
 		},
-		"schema": [
-			{
-				"name": "productid",
-				"type": "String"
-			},
-			{
-				"name": "productname",
-				"type": "String"
-			},
-			{
-				"name": "productcategory",
-				"type": "String"
-			}
-		]
+		"schema": []
 	}
 }
