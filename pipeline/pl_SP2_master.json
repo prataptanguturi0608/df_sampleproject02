@@ -5,8 +5,6 @@
 			{
 				"name": "pl_SftpToRaw",
 				"type": "ExecutePipeline",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [],
 				"policy": {
 					"secureInput": false
@@ -21,8 +19,8 @@
 				}
 			},
 			{
-				"name": "df_Metadata_bronzeToSilver",
-				"type": "ExecuteDataFlow",
+				"name": "pl_RawToCleansed",
+				"type": "ExecutePipeline",
 				"dependsOn": [
 					{
 						"activity": "pl_SftpToRaw",
@@ -32,23 +30,31 @@
 					}
 				],
 				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
 					"secureInput": false
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"dataflow": {
-						"referenceName": "df_Metadata_bronzeToSilver",
-						"type": "DataFlowReference"
+					"pipeline": {
+						"referenceName": "pl_RawToCleansed",
+						"type": "PipelineReference"
 					},
-					"compute": {
-						"coreCount": 8,
-						"computeType": "General"
-					},
-					"traceLevel": "Fine"
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "error log",
+				"type": "Wait",
+				"dependsOn": [
+					{
+						"activity": "pl_SftpToRaw",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"waitTimeInSeconds": 1
 				}
 			}
 		],
