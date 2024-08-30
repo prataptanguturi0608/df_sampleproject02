@@ -114,7 +114,13 @@
 				"     preCommands: [],",
 				"     postCommands: [],",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> CustomersDataSink"
+				"     skipDuplicateMapOutputs: true,",
+				"     mapColumn(",
+				"          CustomerID,",
+				"          First_Name = {First Name},",
+				"          Last_Name = {Last Name},",
+				"          Gender",
+				"     )) ~> CustomersDataSink"
 			]
 		}
 	}
