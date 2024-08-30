@@ -124,8 +124,8 @@
 				"     errorHandlingOption: 'stopOnFirstError',",
 				"     mapColumn(",
 				"          CustomerID,",
-				"          {First Name},",
-				"          {Last Name},",
+				"          First_Name = {First Name},",
+				"          Last_Name = {Last Name},",
 				"          Gender",
 				"     )) ~> CustomersDataLoadtoAzureSQL"
 			]
