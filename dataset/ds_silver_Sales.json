@@ -1,0 +1,48 @@
+{
+	"name": "ds_silver_Sales",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_DLakeStorage",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "ADF_sampleproject02/ds_Silver To Gold"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "Sales_CleansedData_2024-08-31.parquet",
+				"fileSystem": "project02-silver"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": [
+			{
+				"name": "SaleID",
+				"type": "INT32"
+			},
+			{
+				"name": "CustomerID",
+				"type": "INT32"
+			},
+			{
+				"name": "ProductID",
+				"type": "INT32"
+			},
+			{
+				"name": "Quantity",
+				"type": "INT32"
+			},
+			{
+				"name": "SaleDate",
+				"type": "UTF8"
+			},
+			{
+				"name": "Revenue",
+				"type": "DOUBLE"
+			}
+		]
+	}
+}

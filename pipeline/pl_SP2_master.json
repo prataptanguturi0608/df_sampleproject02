@@ -1,0 +1,89 @@
+{
+	"name": "pl_SP2_master",
+	"properties": {
+		"activities": [
+			{
+				"name": "pl_SftpToRaw",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_SftpToRaw",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "pl_RawToCleansed",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "pl_SftpToRaw",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_RawToCleansed",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "error log",
+				"type": "Wait",
+				"dependsOn": [
+					{
+						"activity": "pl_SftpToRaw",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"waitTimeInSeconds": 1
+				}
+			},
+			{
+				"name": "pl_CleansedToStrucutred",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "pl_RawToCleansed",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_CleansedToStrucutred",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			}
+		],
+		"folder": {
+			"name": "ADF_SampleProject02"
+		},
+		"annotations": []
+	}
+}

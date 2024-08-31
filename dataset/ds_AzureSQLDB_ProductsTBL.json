@@ -1,0 +1,19 @@
+{
+	"name": "ds_AzureSQLDB_ProductsTBL",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_AzureSqlDatabase",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "ADF_sampleproject02/ds_Bronze To Silver"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "tbl_sp2_products"
+		}
+	}
+}

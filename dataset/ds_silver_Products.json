@@ -1,0 +1,36 @@
+{
+	"name": "ds_silver_Products",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_DLakeStorage",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "ADF_sampleproject02/ds_Silver To Gold"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "Products_CleansedData_2024-08-31.parquet",
+				"fileSystem": "project02-silver"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": [
+			{
+				"name": "productid",
+				"type": "INT32"
+			},
+			{
+				"name": "productname",
+				"type": "UTF8"
+			},
+			{
+				"name": "productcategory",
+				"type": "UTF8"
+			}
+		]
+	}
+}

@@ -1,0 +1,185 @@
+{
+	"name": "df_SilverToGold_DW",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_silver_Sales",
+						"type": "DatasetReference"
+					},
+					"name": "SalesCleansedData"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_silver_Products",
+						"type": "DatasetReference"
+					},
+					"name": "ProductsCleansedData"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_silver_customers",
+						"type": "DatasetReference"
+					},
+					"name": "CustomersCleansedData"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_AzureSQL_Ekart",
+						"type": "DatasetReference"
+					},
+					"name": "DWSink"
+				}
+			],
+			"transformations": [
+				{
+					"name": "join1"
+				},
+				{
+					"name": "select1"
+				},
+				{
+					"name": "join2"
+				},
+				{
+					"name": "select2"
+				},
+				{
+					"name": "aggregate1"
+				},
+				{
+					"name": "select3"
+				},
+				{
+					"name": "AlterRow1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          SaleID as integer,",
+				"          CustomerID as integer,",
+				"          ProductID as integer,",
+				"          Quantity as integer,",
+				"          SaleDate as string,",
+				"          Revenue as double",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'parquet') ~> SalesCleansedData",
+				"source(output(",
+				"          productid as integer,",
+				"          productname as string,",
+				"          productcategory as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'parquet') ~> ProductsCleansedData",
+				"source(output(",
+				"          CustomerID as integer,",
+				"          First_Name as string,",
+				"          Last_Name as string,",
+				"          Gender as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'parquet') ~> CustomersCleansedData",
+				"SalesCleansedData, ProductsCleansedData join(SalesCleansedData@ProductID == ProductsCleansedData@productid,",
+				"     joinType:'left',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join1",
+				"join1 select(mapColumn(",
+				"          SaleID,",
+				"          CustomerID,",
+				"          ProductID = SalesCleansedData@ProductID,",
+				"          Quantity,",
+				"          SaleDate,",
+				"          Revenue,",
+				"          productname,",
+				"          productcategory",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"select1, CustomersCleansedData join(select1@CustomerID == CustomersCleansedData@CustomerID,",
+				"     joinType:'left',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join2",
+				"join2 select(mapColumn(",
+				"          SaleID,",
+				"          CustomerID = select1@CustomerID,",
+				"          ProductID,",
+				"          Quantity,",
+				"          SaleDate,",
+				"          Revenue,",
+				"          productname,",
+				"          productcategory,",
+				"          First_Name,",
+				"          Last_Name,",
+				"          Gender",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select2",
+				"select2 aggregate(groupBy(SaleID,",
+				"          CustomerID,",
+				"          ProductID,",
+				"          Quantity,",
+				"          SaleDate,",
+				"          Revenue,",
+				"          productcategory,",
+				"          First_Name,",
+				"          Last_Name,",
+				"          productname,",
+				"          Gender),",
+				"     count = count()) ~> aggregate1",
+				"aggregate1 select(mapColumn(",
+				"          SaleID,",
+				"          CustomerID,",
+				"          ProductID,",
+				"          Quantity,",
+				"          SaleDate,",
+				"          Revenue,",
+				"          productcategory,",
+				"          First_Name,",
+				"          Last_Name,",
+				"          productname,",
+				"          Gender",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select3",
+				"select3 alterRow(upsertIf(true())) ~> AlterRow1",
+				"AlterRow1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          CustomerID as integer,",
+				"          First_Name as string,",
+				"          Last_Name as string,",
+				"          Gender as string,",
+				"          productid as integer,",
+				"          productname as string,",
+				"          productcategory as string,",
+				"          SaleID as integer,",
+				"          Quantity as integer,",
+				"          SaleDate as string,",
+				"          Revenue as double",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:false,",
+				"     updateable:false,",
+				"     upsertable:true,",
+				"     keys:['SaleID'],",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> DWSink"
+			]
+		}
+	}
+}
