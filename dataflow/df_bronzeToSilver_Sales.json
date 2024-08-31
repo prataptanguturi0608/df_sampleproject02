@@ -1,5 +1,5 @@
 {
-	"name": "df_Metadata_bronzeToSilver_Sales",
+	"name": "df_bronzeToSilver_Sales",
 	"properties": {
 		"type": "MappingDataFlow",
 		"typeProperties": {

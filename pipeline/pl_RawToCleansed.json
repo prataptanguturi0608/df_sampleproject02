@@ -55,6 +55,7 @@
 					],
 					"storeSettings": {
 						"type": "AzureBlobFSReadSettings",
+						"recursive": true,
 						"enablePartitionDiscovery": false
 					},
 					"formatSettings": {
@@ -95,7 +96,7 @@
 							"userProperties": [],
 							"typeProperties": {
 								"dataflow": {
-									"referenceName": "df_Metadata_bronzeToSilver_Sales",
+									"referenceName": "df_bronzeToSilver_Sales",
 									"type": "DataFlowReference",
 									"parameters": {
 										"p_Sales_FileName": {
