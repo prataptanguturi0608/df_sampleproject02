@@ -87,12 +87,35 @@
 			"properties": {
 				"activities": [
 					{
-						"name": "Wait1",
-						"type": "Wait",
+						"name": "df_SilverToGold_DW",
+						"type": "ExecuteDataFlow",
 						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
 						"userProperties": [],
 						"typeProperties": {
-							"waitTimeInSeconds": 1
+							"dataflow": {
+								"referenceName": "df_SilverToGold_DW",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"SalesCleansedData": {},
+									"ProductsCleansedData": {},
+									"CustomersCleansedData": {},
+									"DWSink": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
 						}
 					}
 				],
@@ -105,7 +128,9 @@
 				"annotations": [],
 				"lastPublishTime": "2024-08-28T08:07:27Z"
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/df_SilverToGold_DW')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/pl_RawToCleansed')]",
@@ -127,7 +152,7 @@
 						"userProperties": [],
 						"typeProperties": {
 							"dataflow": {
-								"referenceName": "df_Metadata_bronzeToSilver_MDM",
+								"referenceName": "df_bronzeToSilver_Metadata",
 								"type": "DataFlowReference",
 								"parameters": {},
 								"datasetParameters": {
@@ -218,7 +243,7 @@
 									"userProperties": [],
 									"typeProperties": {
 										"dataflow": {
-											"referenceName": "df_Metadata_bronzeToSilver_Sales",
+											"referenceName": "df_bronzeToSilver_SalesData",
 											"type": "DataFlowReference",
 											"parameters": {
 												"p_Sales_FileName": {
@@ -254,9 +279,9 @@
 				"lastPublishTime": "2024-08-28T08:07:27Z"
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/dataflows/df_Metadata_bronzeToSilver_MDM')]",
+				"[concat(variables('factoryId'), '/dataflows/df_bronzeToSilver_Metadata')]",
 				"[concat(variables('factoryId'), '/datasets/ds_bronze_Sales')]",
-				"[concat(variables('factoryId'), '/dataflows/df_Metadata_bronzeToSilver_Sales')]"
+				"[concat(variables('factoryId'), '/dataflows/df_bronzeToSilver_SalesData')]"
 			]
 		},
 		{
@@ -580,6 +605,30 @@
 						"typeProperties": {
 							"waitTimeInSeconds": 1
 						}
+					},
+					{
+						"name": "pl_CleansedToStrucutred",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "pl_RawToCleansed",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "pl_CleansedToStrucutred",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
 					}
 				],
 				"policy": {
@@ -592,7 +641,8 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/pipelines/pl_SftpToRaw')]",
-				"[concat(variables('factoryId'), '/pipelines/pl_RawToCleansed')]"
+				"[concat(variables('factoryId'), '/pipelines/pl_RawToCleansed')]",
+				"[concat(variables('factoryId'), '/pipelines/pl_CleansedToStrucutred')]"
 			]
 		},
 		{
@@ -783,7 +833,7 @@
 					"type": "LinkedServiceReference"
 				},
 				"folder": {
-					"name": "ADF_sampleproject02/ds_BronzeTOSilver"
+					"name": "ADF_sampleproject02/ds_Bronze To Silver"
 				},
 				"annotations": [],
 				"type": "AzureSqlTable",
@@ -825,7 +875,7 @@
 					"type": "LinkedServiceReference"
 				},
 				"folder": {
-					"name": "ADF_sampleproject02/ds_BronzeTOSilver"
+					"name": "ADF_sampleproject02/ds_Bronze To Silver"
 				},
 				"annotations": [],
 				"type": "AzureSqlTable",
@@ -849,7 +899,7 @@
 					"type": "LinkedServiceReference"
 				},
 				"folder": {
-					"name": "ADF_sampleproject02/ds_BronzeTOSilver"
+					"name": "ADF_sampleproject02/ds_Bronze To Silver"
 				},
 				"annotations": [],
 				"type": "AzureSqlTable",
@@ -887,6 +937,80 @@
 				"typeProperties": {
 					"schema": "dbo",
 					"table": "tbl_sp2_sales"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_AzureSqlDatabase')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_AzureSQL_Ekart')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_AzureSqlDatabase",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "ADF_sampleproject02/ds_Silver To Gold"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "CustomerID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "First_Name",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Last_Name",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Gender",
+						"type": "nvarchar"
+					},
+					{
+						"name": "productid",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "productname",
+						"type": "nvarchar"
+					},
+					{
+						"name": "productcategory",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SaleID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "Quantity",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SaleDate",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Revenue",
+						"type": "float",
+						"precision": 15
+					}
+				],
+				"typeProperties": {
+					"schema": "proj02",
+					"table": "tbl_ekart"
 				}
 			},
 			"dependsOn": [
@@ -981,7 +1105,7 @@
 					"type": "LinkedServiceReference"
 				},
 				"folder": {
-					"name": "ADF_sampleproject02/ds_BronzeTOSilver"
+					"name": "ADF_sampleproject02/ds_Bronze To Silver"
 				},
 				"annotations": [],
 				"type": "Parquet",
@@ -1008,7 +1132,7 @@
 					"type": "LinkedServiceReference"
 				},
 				"folder": {
-					"name": "ADF_sampleproject02/ds_BronzeTOSilver"
+					"name": "ADF_sampleproject02/ds_Bronze To Silver"
 				},
 				"annotations": [],
 				"type": "DelimitedText",
@@ -1056,7 +1180,7 @@
 					"type": "LinkedServiceReference"
 				},
 				"folder": {
-					"name": "ADF_sampleproject02/ds_BronzeTOSilver"
+					"name": "ADF_sampleproject02/ds_Bronze To Silver"
 				},
 				"annotations": [],
 				"type": "DelimitedText",
@@ -1112,7 +1236,7 @@
 					"type": "LinkedServiceReference"
 				},
 				"folder": {
-					"name": "ADF_sampleproject02/ds_BronzeTOSilver"
+					"name": "ADF_sampleproject02/ds_Bronze To Silver"
 				},
 				"annotations": [],
 				"type": "DelimitedText",
@@ -1260,6 +1384,145 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/ds_silver_Products')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_DLakeStorage",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "ADF_sampleproject02/ds_Silver To Gold"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "Products_CleansedData_2024-08-31.parquet",
+						"fileSystem": "project02-silver"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": [
+					{
+						"name": "productid",
+						"type": "INT32"
+					},
+					{
+						"name": "productname",
+						"type": "UTF8"
+					},
+					{
+						"name": "productcategory",
+						"type": "UTF8"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_DLakeStorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_silver_Sales')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_DLakeStorage",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "ADF_sampleproject02/ds_Silver To Gold"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "Sales_CleansedData_2024-08-31.parquet",
+						"fileSystem": "project02-silver"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": [
+					{
+						"name": "SaleID",
+						"type": "INT32"
+					},
+					{
+						"name": "CustomerID",
+						"type": "INT32"
+					},
+					{
+						"name": "ProductID",
+						"type": "INT32"
+					},
+					{
+						"name": "Quantity",
+						"type": "INT32"
+					},
+					{
+						"name": "SaleDate",
+						"type": "UTF8"
+					},
+					{
+						"name": "Revenue",
+						"type": "DOUBLE"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_DLakeStorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_silver_customers')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_DLakeStorage",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "ADF_sampleproject02/ds_Silver To Gold"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "Customers_CleansedData_2024-08-31.parquet",
+						"fileSystem": "project02-silver"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": [
+					{
+						"name": "CustomerID",
+						"type": "INT32"
+					},
+					{
+						"name": "First_Name",
+						"type": "UTF8"
+					},
+					{
+						"name": "Last_Name",
+						"type": "UTF8"
+					},
+					{
+						"name": "Gender",
+						"type": "UTF8"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_DLakeStorage')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/AzureDataLakeStorage1')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -1369,7 +1632,200 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/df_Metadata_bronzeToSilver_MDM')]",
+			"name": "[concat(parameters('factoryName'), '/df_SilverToGold_DW')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "ds_silver_Sales",
+								"type": "DatasetReference"
+							},
+							"name": "SalesCleansedData"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_silver_Products",
+								"type": "DatasetReference"
+							},
+							"name": "ProductsCleansedData"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_silver_customers",
+								"type": "DatasetReference"
+							},
+							"name": "CustomersCleansedData"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "ds_AzureSQL_Ekart",
+								"type": "DatasetReference"
+							},
+							"name": "DWSink"
+						}
+					],
+					"transformations": [
+						{
+							"name": "join1"
+						},
+						{
+							"name": "select1"
+						},
+						{
+							"name": "join2"
+						},
+						{
+							"name": "select2"
+						},
+						{
+							"name": "aggregate1"
+						},
+						{
+							"name": "select3"
+						},
+						{
+							"name": "AlterRow1"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          SaleID as integer,",
+						"          CustomerID as integer,",
+						"          ProductID as integer,",
+						"          Quantity as integer,",
+						"          SaleDate as string,",
+						"          Revenue as double",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false,",
+						"     format: 'parquet') ~> SalesCleansedData",
+						"source(output(",
+						"          productid as integer,",
+						"          productname as string,",
+						"          productcategory as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false,",
+						"     format: 'parquet') ~> ProductsCleansedData",
+						"source(output(",
+						"          CustomerID as integer,",
+						"          First_Name as string,",
+						"          Last_Name as string,",
+						"          Gender as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false,",
+						"     format: 'parquet') ~> CustomersCleansedData",
+						"SalesCleansedData, ProductsCleansedData join(SalesCleansedData@ProductID == ProductsCleansedData@productid,",
+						"     joinType:'left',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> join1",
+						"join1 select(mapColumn(",
+						"          SaleID,",
+						"          CustomerID,",
+						"          ProductID = SalesCleansedData@ProductID,",
+						"          Quantity,",
+						"          SaleDate,",
+						"          Revenue,",
+						"          productname,",
+						"          productcategory",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select1",
+						"select1, CustomersCleansedData join(select1@CustomerID == CustomersCleansedData@CustomerID,",
+						"     joinType:'left',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> join2",
+						"join2 select(mapColumn(",
+						"          SaleID,",
+						"          CustomerID = select1@CustomerID,",
+						"          ProductID,",
+						"          Quantity,",
+						"          SaleDate,",
+						"          Revenue,",
+						"          productname,",
+						"          productcategory,",
+						"          First_Name,",
+						"          Last_Name,",
+						"          Gender",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select2",
+						"select2 aggregate(groupBy(SaleID,",
+						"          CustomerID,",
+						"          ProductID,",
+						"          Quantity,",
+						"          SaleDate,",
+						"          Revenue,",
+						"          productcategory,",
+						"          First_Name,",
+						"          Last_Name,",
+						"          productname,",
+						"          Gender),",
+						"     count = count()) ~> aggregate1",
+						"aggregate1 select(mapColumn(",
+						"          SaleID,",
+						"          CustomerID,",
+						"          ProductID,",
+						"          Quantity,",
+						"          SaleDate,",
+						"          Revenue,",
+						"          productcategory,",
+						"          First_Name,",
+						"          Last_Name,",
+						"          productname,",
+						"          Gender",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select3",
+						"select3 alterRow(upsertIf(true())) ~> AlterRow1",
+						"AlterRow1 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          CustomerID as integer,",
+						"          First_Name as string,",
+						"          Last_Name as string,",
+						"          Gender as string,",
+						"          productid as integer,",
+						"          productname as string,",
+						"          productcategory as string,",
+						"          SaleID as integer,",
+						"          Quantity as integer,",
+						"          SaleDate as string,",
+						"          Revenue as double",
+						"     ),",
+						"     deletable:false,",
+						"     insertable:false,",
+						"     updateable:false,",
+						"     upsertable:true,",
+						"     keys:['SaleID'],",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError') ~> DWSink"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/ds_silver_Sales')]",
+				"[concat(variables('factoryId'), '/datasets/ds_silver_Products')]",
+				"[concat(variables('factoryId'), '/datasets/ds_silver_customers')]",
+				"[concat(variables('factoryId'), '/datasets/ds_AzureSQL_Ekart')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/df_bronzeToSilver_Metadata')]",
 			"type": "Microsoft.DataFactory/factories/dataflows",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -1437,7 +1893,7 @@
 					],
 					"scriptLines": [
 						"source(output(",
-						"          productid as string,",
+						"          productid as integer,",
 						"          productname as string,",
 						"          productcategory as string",
 						"     ),",
@@ -1546,7 +2002,124 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/df_Metadata_bronzeToSilver_Sales')]",
+			"name": "[concat(parameters('factoryName'), '/df_bronzeToSilver_Sales')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "ds_bronze_Sales",
+								"type": "DatasetReference"
+							},
+							"name": "SalesDataIn"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "ds_AzureSQLDB_SalesTBL",
+								"type": "DatasetReference"
+							},
+							"name": "SalesDataLoadtoAzureSQL"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_Silver_Parquet_out",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "aggregate1"
+						},
+						{
+							"name": "select1"
+						}
+					],
+					"scriptLines": [
+						"parameters{",
+						"     p_Sales_FileName as string",
+						"}",
+						"source(output(",
+						"          SaleID as integer,",
+						"          CustomerID as integer,",
+						"          ProductID as integer,",
+						"          Quantity as integer,",
+						"          SaleDate as string,",
+						"          Revenue as double",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> SalesDataIn",
+						"SalesDataIn aggregate(groupBy(SaleID,",
+						"          CustomerID,",
+						"          ProductID,",
+						"          Quantity,",
+						"          SaleDate,",
+						"          Revenue),",
+						"     count = count()) ~> aggregate1",
+						"aggregate1 select(mapColumn(",
+						"          SaleID,",
+						"          CustomerID,",
+						"          ProductID,",
+						"          Quantity,",
+						"          SaleDate,",
+						"          Revenue",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select1",
+						"select1 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          SaleID as integer,",
+						"          CustomerID as integer,",
+						"          ProductID as integer,",
+						"          Quantity as integer,",
+						"          SaleDate as string,",
+						"          Revenue as double",
+						"     ),",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError',",
+						"     mapColumn(",
+						"          SaleID,",
+						"          CustomerID,",
+						"          ProductID,",
+						"          Quantity,",
+						"          SaleDate,",
+						"          Revenue",
+						"     )) ~> SalesDataLoadtoAzureSQL",
+						"select1 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     format: 'parquet',",
+						"     partitionFileNames:[(concat('Sales_CleansedData_',toString(currentDate()) ,'.parquet'))],",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     partitionBy('hash', 1)) ~> sink1"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/ds_bronze_Sales')]",
+				"[concat(variables('factoryId'), '/datasets/ds_AzureSQLDB_SalesTBL')]",
+				"[concat(variables('factoryId'), '/datasets/ds_Silver_Parquet_out')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/df_bronzeToSilver_SalesData')]",
 			"type": "Microsoft.DataFactory/factories/dataflows",
 			"apiVersion": "2018-06-01",
 			"properties": {

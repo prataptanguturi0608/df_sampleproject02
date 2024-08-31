@@ -81,33 +81,6 @@
 	},
 	"resources": [
 		{
-			"name": "[concat(parameters('factoryName'), '/pl_CleansedToStrucutred')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Wait1",
-						"type": "Wait",
-						"dependsOn": [],
-						"userProperties": [],
-						"typeProperties": {
-							"waitTimeInSeconds": 1
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"folder": {
-					"name": "ADF_SampleProject02"
-				},
-				"annotations": [],
-				"lastPublishTime": "2024-08-28T08:07:27Z"
-			},
-			"dependsOn": []
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/AzureDataLakeStorage1')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -226,7 +199,7 @@
 					"type": "LinkedServiceReference"
 				},
 				"folder": {
-					"name": "ADF_sampleproject02/ds_BronzeTOSilver"
+					"name": "ADF_sampleproject02/ds_Bronze To Silver"
 				},
 				"annotations": [],
 				"type": "AzureSqlTable",
@@ -268,7 +241,7 @@
 					"type": "LinkedServiceReference"
 				},
 				"folder": {
-					"name": "ADF_sampleproject02/ds_BronzeTOSilver"
+					"name": "ADF_sampleproject02/ds_Bronze To Silver"
 				},
 				"annotations": [],
 				"type": "AzureSqlTable",
@@ -292,7 +265,7 @@
 					"type": "LinkedServiceReference"
 				},
 				"folder": {
-					"name": "ADF_sampleproject02/ds_BronzeTOSilver"
+					"name": "ADF_sampleproject02/ds_Bronze To Silver"
 				},
 				"annotations": [],
 				"type": "AzureSqlTable",
@@ -330,6 +303,80 @@
 				"typeProperties": {
 					"schema": "dbo",
 					"table": "tbl_sp2_sales"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_AzureSqlDatabase')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_AzureSQL_Ekart')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_AzureSqlDatabase",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "ADF_sampleproject02/ds_Silver To Gold"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "CustomerID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "First_Name",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Last_Name",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Gender",
+						"type": "nvarchar"
+					},
+					{
+						"name": "productid",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "productname",
+						"type": "nvarchar"
+					},
+					{
+						"name": "productcategory",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SaleID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "Quantity",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SaleDate",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Revenue",
+						"type": "float",
+						"precision": 15
+					}
+				],
+				"typeProperties": {
+					"schema": "proj02",
+					"table": "tbl_ekart"
 				}
 			},
 			"dependsOn": [
@@ -424,7 +471,7 @@
 					"type": "LinkedServiceReference"
 				},
 				"folder": {
-					"name": "ADF_sampleproject02/ds_BronzeTOSilver"
+					"name": "ADF_sampleproject02/ds_Bronze To Silver"
 				},
 				"annotations": [],
 				"type": "Parquet",
@@ -451,7 +498,7 @@
 					"type": "LinkedServiceReference"
 				},
 				"folder": {
-					"name": "ADF_sampleproject02/ds_BronzeTOSilver"
+					"name": "ADF_sampleproject02/ds_Bronze To Silver"
 				},
 				"annotations": [],
 				"type": "DelimitedText",
@@ -499,7 +546,7 @@
 					"type": "LinkedServiceReference"
 				},
 				"folder": {
-					"name": "ADF_sampleproject02/ds_BronzeTOSilver"
+					"name": "ADF_sampleproject02/ds_Bronze To Silver"
 				},
 				"annotations": [],
 				"type": "DelimitedText",
@@ -555,7 +602,7 @@
 					"type": "LinkedServiceReference"
 				},
 				"folder": {
-					"name": "ADF_sampleproject02/ds_BronzeTOSilver"
+					"name": "ADF_sampleproject02/ds_Bronze To Silver"
 				},
 				"annotations": [],
 				"type": "DelimitedText",
@@ -703,262 +750,44 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/pl_SFTP_Files_CopyActivity')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
+			"name": "[concat(parameters('factoryName'), '/ds_silver_Products')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
-				"description": "https://learn.microsoft.com/en-us/azure/data-factory/concepts-nested-activities",
-				"activities": [
-					{
-						"name": "ForEach1",
-						"type": "ForEach",
-						"dependsOn": [],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@pipeline().parameters.p_FilesList",
-								"type": "Expression"
-							},
-							"isSequential": true,
-							"activities": [
-								{
-									"name": "CopyFiles",
-									"type": "Copy",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"source": {
-											"type": "DelimitedTextSource",
-											"storeSettings": {
-												"type": "SftpReadSettings",
-												"recursive": true,
-												"enablePartitionDiscovery": false,
-												"disableChunking": false
-											},
-											"formatSettings": {
-												"type": "DelimitedTextReadSettings"
-											}
-										},
-										"sink": {
-											"type": "DelimitedTextSink",
-											"storeSettings": {
-												"type": "AzureBlobFSWriteSettings",
-												"copyBehavior": "PreserveHierarchy"
-											},
-											"formatSettings": {
-												"type": "DelimitedTextWriteSettings",
-												"quoteAllText": true,
-												"fileExtension": ".txt"
-											}
-										},
-										"enableStaging": false,
-										"translator": {
-											"type": "TabularTranslator",
-											"typeConversion": true,
-											"typeConversionSettings": {
-												"allowDataTruncation": true,
-												"treatBooleanAsNumber": false
-											}
-										}
-									},
-									"inputs": [
-										{
-											"referenceName": "ds_sftp_SalesProject_Files",
-											"type": "DatasetReference",
-											"parameters": {
-												"p_ds_subFolder": {
-													"value": "@concat('SalesProject','/',pipeline().parameters.p_SubFolder)",
-													"type": "Expression"
-												},
-												"p_ds_FileName": {
-													"value": "@item().name",
-													"type": "Expression"
-												}
-											}
-										}
-									],
-									"outputs": [
-										{
-											"referenceName": "ds_Sftp_bronze",
-											"type": "DatasetReference",
-											"parameters": {
-												"p_ds_SubFolder": {
-													"value": "@pipeline().parameters.p_SubFolder",
-													"type": "Expression"
-												}
-											}
-										}
-									]
-								},
-								{
-									"name": "ArchiveFiles",
-									"type": "Copy",
-									"dependsOn": [
-										{
-											"activity": "CopyFiles",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"source": {
-											"type": "DelimitedTextSource",
-											"storeSettings": {
-												"type": "SftpReadSettings",
-												"recursive": true,
-												"enablePartitionDiscovery": false,
-												"disableChunking": false
-											},
-											"formatSettings": {
-												"type": "DelimitedTextReadSettings"
-											}
-										},
-										"sink": {
-											"type": "DelimitedTextSink",
-											"storeSettings": {
-												"type": "AzureBlobStorageWriteSettings"
-											},
-											"formatSettings": {
-												"type": "DelimitedTextWriteSettings",
-												"quoteAllText": true,
-												"fileExtension": ".txt"
-											}
-										},
-										"enableStaging": false,
-										"translator": {
-											"type": "TabularTranslator",
-											"typeConversion": true,
-											"typeConversionSettings": {
-												"allowDataTruncation": true,
-												"treatBooleanAsNumber": false
-											}
-										}
-									},
-									"inputs": [
-										{
-											"referenceName": "ds_sftp_SalesProject_Files",
-											"type": "DatasetReference",
-											"parameters": {
-												"p_ds_subFolder": {
-													"value": "@concat('SalesProject','/',pipeline().parameters.p_SubFolder)",
-													"type": "Expression"
-												},
-												"p_ds_FileName": {
-													"value": "@item().name",
-													"type": "Expression"
-												}
-											}
-										}
-									],
-									"outputs": [
-										{
-											"referenceName": "ds_Sftp_Archive",
-											"type": "DatasetReference",
-											"parameters": {
-												"p_ds_subFolder": {
-													"value": "@concat('SalesProject','/',pipeline().parameters.p_SubFolder,'/',formatDateTime(utcNow(),'yyyy'),'/',formatDateTime(utcNow(),'MM'),'/',formatDateTime(utcNow(),'dd'))\n",
-													"type": "Expression"
-												}
-											}
-										}
-									]
-								},
-								{
-									"name": "Delete1",
-									"type": "Delete",
-									"state": "Inactive",
-									"onInactiveMarkAs": "Succeeded",
-									"dependsOn": [
-										{
-											"activity": "ArchiveFiles",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"dataset": {
-											"referenceName": "ds_sftp_SalesProject_Files",
-											"type": "DatasetReference",
-											"parameters": {
-												"p_ds_subFolder": "@concat('SalesProject','/',pipeline().parameters.p_SubFolder)",
-												"p_ds_FileName": "@item().name"
-											}
-										},
-										"logStorageSettings": {
-											"linkedServiceName": {
-												"referenceName": "ls_AzureBlobStorageArchive",
-												"type": "LinkedServiceReference"
-											},
-											"path": "project02-activitylog"
-										},
-										"enableLogging": true,
-										"storeSettings": {
-											"type": "SftpReadSettings",
-											"recursive": true,
-											"enablePartitionDiscovery": false,
-											"disableChunking": false
-										}
-									}
-								}
-							]
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"parameters": {
-					"p_FilesList": {
-						"type": "array"
-					},
-					"p_SubFolder": {
-						"type": "string"
-					}
-				},
-				"variables": {
-					"v_Filename": {
-						"type": "String"
-					},
-					"v_subFolder": {
-						"type": "String"
-					}
+				"linkedServiceName": {
+					"referenceName": "ls_DLakeStorage",
+					"type": "LinkedServiceReference"
 				},
 				"folder": {
-					"name": "ADF_SampleProject02"
+					"name": "ADF_sampleproject02/ds_Silver To Gold"
 				},
 				"annotations": [],
-				"lastPublishTime": "2024-08-28T11:24:03Z"
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "Products_CleansedData_2024-08-31.parquet",
+						"fileSystem": "project02-silver"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": [
+					{
+						"name": "productid",
+						"type": "INT32"
+					},
+					{
+						"name": "productname",
+						"type": "UTF8"
+					},
+					{
+						"name": "productcategory",
+						"type": "UTF8"
+					}
+				]
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/ds_sftp_SalesProject_Files')]",
-				"[concat(variables('factoryId'), '/datasets/ds_Sftp_bronze')]",
-				"[concat(variables('factoryId'), '/datasets/ds_Sftp_Archive')]",
-				"[concat(variables('factoryId'), '/linkedServices/ls_AzureBlobStorageArchive')]"
+				"[concat(variables('factoryId'), '/linkedServices/ls_DLakeStorage')]"
 			]
 		}
 	]
