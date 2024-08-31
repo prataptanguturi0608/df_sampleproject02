@@ -19,6 +19,13 @@
 						"type": "DatasetReference"
 					},
 					"name": "SalesDataLoadtoAzureSQL"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_Silver_Parquet_out",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
 				}
 			],
 			"transformations": [
@@ -86,7 +93,16 @@
 				"          Quantity,",
 				"          SaleDate,",
 				"          Revenue",
-				"     )) ~> SalesDataLoadtoAzureSQL"
+				"     )) ~> SalesDataLoadtoAzureSQL",
+				"select1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'parquet',",
+				"     partitionFileNames:[(concat('Sales_CleansedData',toString(currentDate()) ,'.parquet'))],",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sink1"
 			]
 		}
 	}
