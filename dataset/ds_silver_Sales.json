@@ -20,20 +20,28 @@
 		},
 		"schema": [
 			{
+				"name": "SaleID",
+				"type": "INT32"
+			},
+			{
 				"name": "CustomerID",
 				"type": "INT32"
 			},
 			{
-				"name": "First_Name",
+				"name": "ProductID",
+				"type": "INT32"
+			},
+			{
+				"name": "Quantity",
+				"type": "INT32"
+			},
+			{
+				"name": "SaleDate",
 				"type": "UTF8"
 			},
 			{
-				"name": "Last_Name",
-				"type": "UTF8"
-			},
-			{
-				"name": "Gender",
-				"type": "UTF8"
+				"name": "Revenue",
+				"type": "DOUBLE"
 			}
 		]
 	}
