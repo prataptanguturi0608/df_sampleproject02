@@ -1,0 +1,69 @@
+{
+	"name": "ds_AzureSQL_Ekart",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_AzureSqlDatabase",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "ADF_sampleproject02/ds_Silver To Gold"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "CustomerID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "First_Name",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Last_Name",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Gender",
+				"type": "nvarchar"
+			},
+			{
+				"name": "productid",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "productname",
+				"type": "nvarchar"
+			},
+			{
+				"name": "productcategory",
+				"type": "nvarchar"
+			},
+			{
+				"name": "SaleID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Quantity",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "SaleDate",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Revenue",
+				"type": "float",
+				"precision": 15
+			}
+		],
+		"typeProperties": {
+			"schema": "proj02",
+			"table": "tbl_ekart"
+		}
+	}
+}
