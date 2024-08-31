@@ -13,24 +13,11 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"fileName": "Products_CleansedData2024-08-31.parquet",
+				"fileName": "Products_CleansedData_2024-08-31.parquet",
 				"fileSystem": "project02-silver"
 			},
 			"compressionCodec": "snappy"
 		},
-		"schema": [
-			{
-				"name": "productid",
-				"type": "UTF8"
-			},
-			{
-				"name": "productname",
-				"type": "UTF8"
-			},
-			{
-				"name": "productcategory",
-				"type": "UTF8"
-			}
-		]
+		"schema": []
 	}
 }
