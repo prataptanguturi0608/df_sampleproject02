@@ -97,7 +97,7 @@
 				"select1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     format: 'parquet',",
-				"     partitionFileNames:[(concat('Sales_CleansedData',toString(currentDate()) ,'.parquet'))],",
+				"     partitionFileNames:[(concat('Sales_CleansedData_',toString(currentDate()) ,'.parquet'))],",
 				"     umask: 0022,",
 				"     preCommands: [],",
 				"     postCommands: [],",
