@@ -47,6 +47,9 @@
 				},
 				{
 					"name": "select2"
+				},
+				{
+					"name": "aggregate1"
 				}
 			],
 			"scriptLines": [
@@ -118,7 +121,17 @@
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> select2",
-				"select2 sink(allowSchemaDrift: true,",
+				"select2 aggregate(groupBy(SaleID,",
+				"          CustomerID,",
+				"          ProductID,",
+				"          Quantity,",
+				"          SaleDate,",
+				"          Revenue,",
+				"          productcategory,",
+				"          First_Name,",
+				"          Last_Name,",
+				"          productname)) ~> aggregate1",
+				"aggregate1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
 				"          CustomerID as integer,",
