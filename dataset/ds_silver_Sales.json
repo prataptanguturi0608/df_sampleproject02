@@ -1,5 +1,5 @@
 {
-	"name": "ds_silver_customers",
+	"name": "ds_silver_Sales",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "ls_DLakeStorage",
@@ -13,7 +13,7 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"fileName": "Customers_CleansedData2024-08-31.parquet",
+				"fileName": "Sales_CleansedData2024-08-31.parquet",
 				"fileSystem": "project02-silver"
 			},
 			"compressionCodec": "snappy"
