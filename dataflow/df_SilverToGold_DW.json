@@ -6,21 +6,54 @@
 			"sources": [
 				{
 					"dataset": {
+						"referenceName": "ds_silver_Sales",
+						"type": "DatasetReference"
+					},
+					"name": "SalesCleansedData"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_silver_Products",
+						"type": "DatasetReference"
+					},
+					"name": "ProductsCleansedData"
+				},
+				{
+					"dataset": {
 						"referenceName": "ds_silver_customers",
 						"type": "DatasetReference"
 					},
-					"name": "source1"
-				},
-				{
-					"name": "source2"
-				},
-				{
-					"name": "source3"
+					"name": "CustomersCleansedData"
 				}
 			],
 			"sinks": [],
-			"transformations": [],
+			"transformations": [
+				{
+					"name": "join1"
+				}
+			],
 			"scriptLines": [
+				"source(output(",
+				"          SaleID as integer,",
+				"          CustomerID as integer,",
+				"          ProductID as integer,",
+				"          Quantity as integer,",
+				"          SaleDate as string,",
+				"          Revenue as double",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'parquet') ~> SalesCleansedData",
+				"source(output(",
+				"          productid as string,",
+				"          productname as string,",
+				"          productcategory as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'parquet') ~> ProductsCleansedData",
 				"source(output(",
 				"          CustomerID as integer,",
 				"          First_Name as string,",
@@ -30,11 +63,12 @@
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     ignoreNoFilesFound: false,",
-				"     format: 'parquet') ~> source1",
-				"source(allowSchemaDrift: true,",
-				"     validateSchema: false) ~> source2",
-				"source(allowSchemaDrift: true,",
-				"     validateSchema: false) ~> source3"
+				"     format: 'parquet') ~> CustomersCleansedData",
+				"SalesCleansedData, ProductsCleansedData join(SalesCleansedData@ProductID == ProductsCleansedData@productid,",
+				"     joinType:'left',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join1"
 			]
 		}
 	}
