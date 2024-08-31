@@ -20,19 +20,15 @@
 		},
 		"schema": [
 			{
-				"name": "CustomerID",
-				"type": "INT32"
-			},
-			{
-				"name": "First_Name",
+				"name": "productid",
 				"type": "UTF8"
 			},
 			{
-				"name": "Last_Name",
+				"name": "productname",
 				"type": "UTF8"
 			},
 			{
-				"name": "Gender",
+				"name": "productcategory",
 				"type": "UTF8"
 			}
 		]
