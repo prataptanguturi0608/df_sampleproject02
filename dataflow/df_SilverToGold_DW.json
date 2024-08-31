@@ -32,7 +32,7 @@
 						"referenceName": "ds_AzureSQL_Ekart",
 						"type": "DatasetReference"
 					},
-					"name": "sink1"
+					"name": "DWSink"
 				}
 			],
 			"transformations": [
@@ -153,7 +153,7 @@
 				"     format: 'table',",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true,",
-				"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
+				"     errorHandlingOption: 'stopOnFirstError') ~> DWSink"
 			]
 		}
 	}
