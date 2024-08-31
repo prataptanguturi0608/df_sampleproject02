@@ -1,5 +1,5 @@
 {
-	"name": "df_Metadata_bronzeToSilver_MDM",
+	"name": "df_bronzeToSilver_Metadata",
 	"properties": {
 		"type": "MappingDataFlow",
 		"typeProperties": {

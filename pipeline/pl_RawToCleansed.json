@@ -16,7 +16,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"dataflow": {
-						"referenceName": "df_Metadata_bronzeToSilver_MDM",
+						"referenceName": "df_bronzeToSilver_Metadata",
 						"type": "DataFlowReference"
 					},
 					"compute": {
@@ -96,7 +96,7 @@
 							"userProperties": [],
 							"typeProperties": {
 								"dataflow": {
-									"referenceName": "df_bronzeToSilver_Sales",
+									"referenceName": "df_bronzeToSilver_SalesData",
 									"type": "DataFlowReference",
 									"parameters": {
 										"p_Sales_FileName": {
