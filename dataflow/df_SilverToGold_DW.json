@@ -1,10 +1,14 @@
 {
-	"name": "dataflow1",
+	"name": "df_SilverToGold_DW",
 	"properties": {
 		"type": "MappingDataFlow",
 		"typeProperties": {
 			"sources": [
 				{
+					"dataset": {
+						"referenceName": "ds_silver_customers",
+						"type": "DatasetReference"
+					},
 					"name": "source1"
 				},
 				{
@@ -17,8 +21,16 @@
 			"sinks": [],
 			"transformations": [],
 			"scriptLines": [
-				"source(allowSchemaDrift: true,",
-				"     validateSchema: false) ~> source1",
+				"source(output(",
+				"          CustomerID as integer,",
+				"          First_Name as string,",
+				"          Last_Name as string,",
+				"          Gender as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'parquet') ~> source1",
 				"source(allowSchemaDrift: true,",
 				"     validateSchema: false) ~> source2",
 				"source(allowSchemaDrift: true,",

@@ -1,0 +1,37 @@
+{
+	"name": "ds_silver_customers",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_DLakeStorage",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "Customers_CleansedData2024-08-31.parquet",
+				"fileSystem": "project02-silver"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": [
+			{
+				"name": "CustomerID",
+				"type": "INT32"
+			},
+			{
+				"name": "First_Name",
+				"type": "UTF8"
+			},
+			{
+				"name": "Last_Name",
+				"type": "UTF8"
+			},
+			{
+				"name": "Gender",
+				"type": "UTF8"
+			}
+		]
+	}
+}
