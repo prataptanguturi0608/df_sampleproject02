@@ -26,10 +26,27 @@
 					"name": "CustomersCleansedData"
 				}
 			],
-			"sinks": [],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_AzureSQL_Ekart",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
 			"transformations": [
 				{
 					"name": "join1"
+				},
+				{
+					"name": "select1"
+				},
+				{
+					"name": "join2"
+				},
+				{
+					"name": "select2"
 				}
 			],
 			"scriptLines": [
@@ -68,7 +85,62 @@
 				"     joinType:'left',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
-				"     broadcast: 'auto')~> join1"
+				"     broadcast: 'auto')~> join1",
+				"join1 select(mapColumn(",
+				"          SaleID,",
+				"          CustomerID,",
+				"          ProductID = SalesCleansedData@ProductID,",
+				"          Quantity,",
+				"          SaleDate,",
+				"          Revenue,",
+				"          productname,",
+				"          productcategory",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"select1, CustomersCleansedData join(select1@CustomerID == CustomersCleansedData@CustomerID,",
+				"     joinType:'left',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join2",
+				"join2 select(mapColumn(",
+				"          SaleID,",
+				"          CustomerID = select1@CustomerID,",
+				"          ProductID,",
+				"          Quantity,",
+				"          SaleDate,",
+				"          Revenue,",
+				"          productname,",
+				"          productcategory,",
+				"          First_Name,",
+				"          Last_Name,",
+				"          Gender",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select2",
+				"select2 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          CustomerID as integer,",
+				"          First_Name as string,",
+				"          Last_Name as string,",
+				"          Gender as string,",
+				"          productid as integer,",
+				"          productname as string,",
+				"          productcategory as string,",
+				"          SaleID as integer,",
+				"          Quantity as integer,",
+				"          SaleDate as string,",
+				"          Revenue as double",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
 			]
 		}
 	}
