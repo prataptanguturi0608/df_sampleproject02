@@ -228,7 +228,8 @@
 											},
 											"datasetParameters": {
 												"SalesDataIn": {},
-												"SalesDataLoadtoAzureSQL": {}
+												"SalesDataLoadtoAzureSQL": {},
+												"sink1": {}
 											}
 										},
 										"staging": {},
@@ -1479,7 +1480,7 @@
 						"select1 sink(allowSchemaDrift: true,",
 						"     validateSchema: false,",
 						"     format: 'parquet',",
-						"     partitionFileNames:[('Products_CleansedData.parquet')],",
+						"     partitionFileNames:[(concat('Products_CleansedData_',toString(currentDate()),'.parquet'))],",
 						"     umask: 0022,",
 						"     preCommands: [],",
 						"     postCommands: [],",
@@ -1494,7 +1495,7 @@
 						"select2 sink(allowSchemaDrift: true,",
 						"     validateSchema: false,",
 						"     format: 'parquet',",
-						"     partitionFileNames:['\\'Customers_CleansedData.parquet\\''],",
+						"     partitionFileNames:[(concat('Customers_CleansedData_',toString(currentDate()),'.parquet'))],",
 						"     umask: 0022,",
 						"     preCommands: [],",
 						"     postCommands: [],",
@@ -1505,7 +1506,8 @@
 						"          First_Name = {First Name},",
 						"          Last_Name = {Last Name},",
 						"          Gender",
-						"     )) ~> CustomersDataSink",
+						"     ),",
+						"     partitionBy('hash', 1)) ~> CustomersDataSink",
 						"select1 sink(allowSchemaDrift: true,",
 						"     validateSchema: false,",
 						"     deletable:false,",
@@ -1566,6 +1568,13 @@
 								"type": "DatasetReference"
 							},
 							"name": "SalesDataLoadtoAzureSQL"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_Silver_Parquet_out",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
 						}
 					],
 					"transformations": [
@@ -1633,13 +1642,24 @@
 						"          Quantity,",
 						"          SaleDate,",
 						"          Revenue",
-						"     )) ~> SalesDataLoadtoAzureSQL"
+						"     )) ~> SalesDataLoadtoAzureSQL",
+						"select1 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     format: 'parquet',",
+						"     partitionFileNames:[(concat('Sales_CleansedData_',toString(currentDate()) ,'.parquet'))],",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     partitionBy('hash', 1)) ~> sink1"
 					]
 				}
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/ds_bronze_Sales')]",
-				"[concat(variables('factoryId'), '/datasets/ds_AzureSQLDB_SalesTBL')]"
+				"[concat(variables('factoryId'), '/datasets/ds_AzureSQLDB_SalesTBL')]",
+				"[concat(variables('factoryId'), '/datasets/ds_Silver_Parquet_out')]"
 			]
 		}
 	]
