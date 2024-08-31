@@ -63,7 +63,7 @@
 				"     ignoreNoFilesFound: false,",
 				"     format: 'parquet') ~> SalesCleansedData",
 				"source(output(",
-				"          productid as string,",
+				"          productid as integer,",
 				"          productname as string,",
 				"          productcategory as string",
 				"     ),",
