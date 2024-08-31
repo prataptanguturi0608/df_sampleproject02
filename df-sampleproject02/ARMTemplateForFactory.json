@@ -1889,6 +1889,12 @@
 						},
 						{
 							"name": "select2"
+						},
+						{
+							"name": "AlterRow1"
+						},
+						{
+							"name": "AlterRow2"
 						}
 					],
 					"scriptLines": [
@@ -1933,6 +1939,8 @@
 						"     ),",
 						"     skipDuplicateMapInputs: true,",
 						"     skipDuplicateMapOutputs: true) ~> select2",
+						"select1 alterRow(upsertIf(true())) ~> AlterRow1",
+						"select2 alterRow(upsertIf(true())) ~> AlterRow2",
 						"select1 sink(allowSchemaDrift: true,",
 						"     validateSchema: false,",
 						"     format: 'parquet',",
@@ -1964,17 +1972,18 @@
 						"          Gender",
 						"     ),",
 						"     partitionBy('hash', 1)) ~> CustomersDataSink",
-						"select1 sink(allowSchemaDrift: true,",
+						"AlterRow1 sink(allowSchemaDrift: true,",
 						"     validateSchema: false,",
 						"     deletable:false,",
-						"     insertable:true,",
+						"     insertable:false,",
 						"     updateable:false,",
-						"     upsertable:false,",
+						"     upsertable:true,",
+						"     keys:['productid'],",
 						"     format: 'table',",
 						"     skipDuplicateMapInputs: true,",
 						"     skipDuplicateMapOutputs: true,",
 						"     errorHandlingOption: 'stopOnFirstError') ~> sink1",
-						"select2 sink(allowSchemaDrift: true,",
+						"AlterRow2 sink(allowSchemaDrift: true,",
 						"     validateSchema: false,",
 						"     input(",
 						"          CustomerID as integer,",
@@ -1983,9 +1992,10 @@
 						"          Gender as string",
 						"     ),",
 						"     deletable:false,",
-						"     insertable:true,",
+						"     insertable:false,",
 						"     updateable:false,",
-						"     upsertable:false,",
+						"     upsertable:true,",
+						"     keys:['CustomerID'],",
 						"     format: 'table',",
 						"     skipDuplicateMapInputs: true,",
 						"     skipDuplicateMapOutputs: true,",
@@ -1999,123 +2009,6 @@
 				"[concat(variables('factoryId'), '/datasets/ds_Silver_Parquet_out')]",
 				"[concat(variables('factoryId'), '/datasets/ds_AzureSQLDB_ProductsTBL')]",
 				"[concat(variables('factoryId'), '/datasets/ds_AzureSQLDB_CustomersTBL')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/df_bronzeToSilver_Sales')]",
-			"type": "Microsoft.DataFactory/factories/dataflows",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"type": "MappingDataFlow",
-				"typeProperties": {
-					"sources": [
-						{
-							"dataset": {
-								"referenceName": "ds_bronze_Sales",
-								"type": "DatasetReference"
-							},
-							"name": "SalesDataIn"
-						}
-					],
-					"sinks": [
-						{
-							"dataset": {
-								"referenceName": "ds_AzureSQLDB_SalesTBL",
-								"type": "DatasetReference"
-							},
-							"name": "SalesDataLoadtoAzureSQL"
-						},
-						{
-							"dataset": {
-								"referenceName": "ds_Silver_Parquet_out",
-								"type": "DatasetReference"
-							},
-							"name": "sink1"
-						}
-					],
-					"transformations": [
-						{
-							"name": "aggregate1"
-						},
-						{
-							"name": "select1"
-						}
-					],
-					"scriptLines": [
-						"parameters{",
-						"     p_Sales_FileName as string",
-						"}",
-						"source(output(",
-						"          SaleID as integer,",
-						"          CustomerID as integer,",
-						"          ProductID as integer,",
-						"          Quantity as integer,",
-						"          SaleDate as string,",
-						"          Revenue as double",
-						"     ),",
-						"     allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     ignoreNoFilesFound: false) ~> SalesDataIn",
-						"SalesDataIn aggregate(groupBy(SaleID,",
-						"          CustomerID,",
-						"          ProductID,",
-						"          Quantity,",
-						"          SaleDate,",
-						"          Revenue),",
-						"     count = count()) ~> aggregate1",
-						"aggregate1 select(mapColumn(",
-						"          SaleID,",
-						"          CustomerID,",
-						"          ProductID,",
-						"          Quantity,",
-						"          SaleDate,",
-						"          Revenue",
-						"     ),",
-						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true) ~> select1",
-						"select1 sink(allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     input(",
-						"          SaleID as integer,",
-						"          CustomerID as integer,",
-						"          ProductID as integer,",
-						"          Quantity as integer,",
-						"          SaleDate as string,",
-						"          Revenue as double",
-						"     ),",
-						"     deletable:false,",
-						"     insertable:true,",
-						"     updateable:false,",
-						"     upsertable:false,",
-						"     format: 'table',",
-						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true,",
-						"     errorHandlingOption: 'stopOnFirstError',",
-						"     mapColumn(",
-						"          SaleID,",
-						"          CustomerID,",
-						"          ProductID,",
-						"          Quantity,",
-						"          SaleDate,",
-						"          Revenue",
-						"     )) ~> SalesDataLoadtoAzureSQL",
-						"select1 sink(allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     format: 'parquet',",
-						"     partitionFileNames:[(concat('Sales_CleansedData_',toString(currentDate()) ,'.parquet'))],",
-						"     umask: 0022,",
-						"     preCommands: [],",
-						"     postCommands: [],",
-						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true,",
-						"     partitionBy('hash', 1)) ~> sink1"
-					]
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/ds_bronze_Sales')]",
-				"[concat(variables('factoryId'), '/datasets/ds_AzureSQLDB_SalesTBL')]",
-				"[concat(variables('factoryId'), '/datasets/ds_Silver_Parquet_out')]"
 			]
 		},
 		{
@@ -2156,6 +2049,9 @@
 						},
 						{
 							"name": "select1"
+						},
+						{
+							"name": "AlterRow1"
 						}
 					],
 					"scriptLines": [
@@ -2190,7 +2086,8 @@
 						"     ),",
 						"     skipDuplicateMapInputs: true,",
 						"     skipDuplicateMapOutputs: true) ~> select1",
-						"select1 sink(allowSchemaDrift: true,",
+						"select1 alterRow(upsertIf(true())) ~> AlterRow1",
+						"AlterRow1 sink(allowSchemaDrift: true,",
 						"     validateSchema: false,",
 						"     input(",
 						"          SaleID as integer,",
@@ -2201,9 +2098,10 @@
 						"          Revenue as double",
 						"     ),",
 						"     deletable:false,",
-						"     insertable:true,",
+						"     insertable:false,",
 						"     updateable:false,",
-						"     upsertable:false,",
+						"     upsertable:true,",
+						"     keys:['SaleID'],",
 						"     format: 'table',",
 						"     skipDuplicateMapInputs: true,",
 						"     skipDuplicateMapOutputs: true,",
