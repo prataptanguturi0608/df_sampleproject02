@@ -39,14 +39,14 @@
 						"referenceName": "ds_AzureSQLDB_ProductsTBL",
 						"type": "DatasetReference"
 					},
-					"name": "sink1"
+					"name": "DataLoadToProductsTable"
 				},
 				{
 					"dataset": {
 						"referenceName": "ds_AzureSQLDB_CustomersTBL",
 						"type": "DatasetReference"
 					},
-					"name": "sink2"
+					"name": "DataLoadToCustomersTable"
 				}
 			],
 			"transformations": [
@@ -154,7 +154,12 @@
 				"     format: 'table',",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true,",
-				"     errorHandlingOption: 'stopOnFirstError') ~> sink1",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          productid,",
+				"          productname,",
+				"          productcategory",
+				"     )) ~> DataLoadToProductsTable",
 				"AlterRow2 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
@@ -171,7 +176,13 @@
 				"     format: 'table',",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true,",
-				"     errorHandlingOption: 'stopOnFirstError') ~> sink2"
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          CustomerID,",
+				"          First_Name = {First Name},",
+				"          Last_Name = {Last Name},",
+				"          Gender",
+				"     )) ~> DataLoadToCustomersTable"
 			]
 		}
 	}
