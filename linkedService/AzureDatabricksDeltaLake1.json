@@ -1,0 +1,12 @@
+{
+	"name": "AzureDatabricksDeltaLake1",
+	"properties": {
+		"annotations": [],
+		"type": "AzureDatabricksDeltaLake",
+		"typeProperties": {
+			"domain": "https://adb-1504801268539580.0.azuredatabricks.net",
+			"clusterId": "masternode",
+			"workspaceResourceId": "/subscriptions/5ac19727-3b9f-4957-ad42-341520c72ac2/resourceGroups/MFSRG/providers/Microsoft.Databricks/workspaces/dbproject01"
+		}
+	}
+}
