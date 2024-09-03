@@ -3,8 +3,8 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "df_SilverToGold_DW",
-				"type": "ExecuteDataFlow",
+				"name": "Notebook1",
+				"type": "DatabricksNotebook",
 				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
@@ -15,15 +15,11 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"dataflow": {
-						"referenceName": "df_SilverToGold_DW",
-						"type": "DataFlowReference"
-					},
-					"compute": {
-						"coreCount": 8,
-						"computeType": "General"
-					},
-					"traceLevel": "Fine"
+					"notebookPath": "/Shared/Project02/Notebook_SilverToGold"
+				},
+				"linkedServiceName": {
+					"referenceName": "ls_AzureDatabricks",
+					"type": "LinkedServiceReference"
 				}
 			}
 		],
