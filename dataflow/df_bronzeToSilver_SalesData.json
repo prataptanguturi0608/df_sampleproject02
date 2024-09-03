@@ -21,11 +21,11 @@
 					"name": "SalesDataLoadtoAzureSQL"
 				},
 				{
-					"dataset": {
-						"referenceName": "ds_Silver_Parquet_out",
-						"type": "DatasetReference"
+					"linkedService": {
+						"referenceName": "ls_DLakeStorage",
+						"type": "LinkedServiceReference"
 					},
-					"name": "sink1"
+					"name": "SalesDataSinkDeltaFormat"
 				}
 			],
 			"transformations": [
@@ -101,14 +101,24 @@
 				"     )) ~> SalesDataLoadtoAzureSQL",
 				"select1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
-				"     format: 'parquet',",
+				"     format: 'delta',",
+				"     fileSystem: 'project02-silver',",
+				"     folderPath: 'Sales',",
+				"     mergeSchema: false,",
+				"     autoCompact: false,",
+				"     optimizedWrite: false,",
+				"     vacuum: 0,",
+				"     deletable: false,",
+				"     insertable: true,",
+				"     updateable: false,",
+				"     upsertable: false,",
 				"     partitionFileNames:[(concat('Sales_CleansedData_',toString(currentDate()) ,'.parquet'))],",
 				"     umask: 0022,",
 				"     preCommands: [],",
 				"     postCommands: [],",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true,",
-				"     partitionBy('hash', 1)) ~> sink1"
+				"     partitionBy('hash', 1)) ~> SalesDataSinkDeltaFormat"
 			]
 		}
 	}
