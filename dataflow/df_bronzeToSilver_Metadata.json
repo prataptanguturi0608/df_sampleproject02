@@ -21,18 +21,18 @@
 			],
 			"sinks": [
 				{
-					"dataset": {
-						"referenceName": "ds_Silver_Parquet_out",
-						"type": "DatasetReference"
+					"linkedService": {
+						"referenceName": "ls_DLakeStorage",
+						"type": "LinkedServiceReference"
 					},
-					"name": "ProductsDataSink"
+					"name": "ProductsDataSinkDeltaForamat"
 				},
 				{
-					"dataset": {
-						"referenceName": "ds_Silver_Parquet_out",
-						"type": "DatasetReference"
+					"linkedService": {
+						"referenceName": "ls_DLakeStorage",
+						"type": "LinkedServiceReference"
 					},
-					"name": "CustomersDataSink"
+					"name": "CustomersDataSinkDeltaForamt"
 				},
 				{
 					"dataset": {
@@ -115,35 +115,44 @@
 				"select2 alterRow(upsertIf(true())) ~> AlterRow2",
 				"select1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
-				"     format: 'parquet',",
+				"     format: 'delta',",
+				"     fileSystem: 'project02-silver',",
+				"     folderPath: 'Products',",
+				"     mergeSchema: false,",
+				"     autoCompact: false,",
+				"     optimizedWrite: false,",
+				"     vacuum: 0,",
+				"     deletable: false,",
+				"     insertable: true,",
+				"     updateable: false,",
+				"     upsertable: false,",
 				"     partitionFileNames:[(concat('Products_CleansedData_',toString(currentDate()),'.parquet'))],",
 				"     umask: 0022,",
 				"     preCommands: [],",
 				"     postCommands: [],",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true,",
-				"     mapColumn(",
-				"          productid,",
-				"          productname,",
-				"          productcategory",
-				"     ),",
-				"     partitionBy('hash', 1)) ~> ProductsDataSink",
+				"     partitionBy('hash', 1)) ~> ProductsDataSinkDeltaForamat",
 				"select2 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
-				"     format: 'parquet',",
+				"     format: 'delta',",
+				"     fileSystem: 'project02-silver',",
+				"     folderPath: 'Customers',",
+				"     mergeSchema: false,",
+				"     autoCompact: false,",
+				"     optimizedWrite: false,",
+				"     vacuum: 0,",
+				"     deletable: false,",
+				"     insertable: true,",
+				"     updateable: false,",
+				"     upsertable: false,",
 				"     partitionFileNames:[(concat('Customers_CleansedData_',toString(currentDate()),'.parquet'))],",
 				"     umask: 0022,",
 				"     preCommands: [],",
 				"     postCommands: [],",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true,",
-				"     mapColumn(",
-				"          CustomerID,",
-				"          First_Name = {First Name},",
-				"          Last_Name = {Last Name},",
-				"          Gender",
-				"     ),",
-				"     partitionBy('hash', 1)) ~> CustomersDataSink",
+				"     partitionBy('hash', 1)) ~> CustomersDataSinkDeltaForamt",
 				"AlterRow1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     deletable:false,",
