@@ -10,6 +10,10 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
+				"folderPath": {
+					"value": "*",
+					"type": "Expression"
+				},
 				"fileSystem": "project02-silver"
 			}
 		}
