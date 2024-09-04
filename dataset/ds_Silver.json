@@ -5,6 +5,9 @@
 			"referenceName": "ls_DLakeStorage",
 			"type": "LinkedServiceReference"
 		},
+		"folder": {
+			"name": "ADF_sampleproject02/ds_Silver To Gold"
+		},
 		"annotations": [],
 		"type": "Binary",
 		"typeProperties": {

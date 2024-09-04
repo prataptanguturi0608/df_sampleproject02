@@ -1,6 +1,9 @@
 {
 	"name": "df_bronzeToSilver_Metadata",
 	"properties": {
+		"folder": {
+			"name": "ADF_SampleProject02"
+		},
 		"type": "MappingDataFlow",
 		"typeProperties": {
 			"sources": [
