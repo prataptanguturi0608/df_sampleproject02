@@ -1,0 +1,9 @@
+{
+	"name": "pl_ADB_Master",
+	"properties": {
+		"folder": {
+			"name": "ADB_SampleProject02"
+		},
+		"annotations": []
+	}
+}
