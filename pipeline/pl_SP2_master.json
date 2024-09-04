@@ -5,8 +5,6 @@
 			{
 				"name": "pl_SftpToRaw",
 				"type": "ExecutePipeline",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [],
 				"policy": {
 					"secureInput": false
