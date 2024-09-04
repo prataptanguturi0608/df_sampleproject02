@@ -7,37 +7,17 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "df-sampleproject02"
 		},
-		"AzureDataLakeStorage1_servicePrincipalCredential": {
-			"type": "secureString",
-			"metadata": "Secure string for 'servicePrincipalCredential' of 'AzureDataLakeStorage1'"
-		},
 		"ls_AzureBlobStorageArchive_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'ls_AzureBlobStorageArchive'"
-		},
-		"ls_AzureSqlDatabase_password": {
-			"type": "secureString",
-			"metadata": "Secure string for 'password' of 'ls_AzureSqlDatabase'"
-		},
-		"ls_DLakeStorage_servicePrincipalCredential": {
-			"type": "secureString",
-			"metadata": "Secure string for 'servicePrincipalCredential' of 'ls_DLakeStorage'"
 		},
 		"ls_SftpStorage_password": {
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'ls_SftpStorage'"
 		},
-		"AzureDataLakeStorage1_properties_typeProperties_url": {
+		"ls_AzureDatabricks_properties_typeProperties_existingClusterId": {
 			"type": "string",
-			"defaultValue": "https://dlakeadf.dfs.core.windows.net/"
-		},
-		"AzureDataLakeStorage1_properties_typeProperties_tenant": {
-			"type": "string",
-			"defaultValue": "0320f3ce-af6b-4b19-80da-d948d9d67a09"
-		},
-		"AzureDataLakeStorage1_properties_typeProperties_servicePrincipalId": {
-			"type": "string",
-			"defaultValue": "22de1254-05fc-4ee8-9962-ee09ec1f4096"
+			"defaultValue": "0821-094203-orrljn1u"
 		},
 		"ls_AzureKeyVault_properties_typeProperties_baseUrl": {
 			"type": "string",
@@ -58,14 +38,6 @@
 		"ls_DLakeStorage_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://dlakeadf.dfs.core.windows.net/"
-		},
-		"ls_DLakeStorage_properties_typeProperties_tenant": {
-			"type": "string",
-			"defaultValue": "0320f3ce-af6b-4b19-80da-d948d9d67a09"
-		},
-		"ls_DLakeStorage_properties_typeProperties_servicePrincipalId": {
-			"type": "string",
-			"defaultValue": "22de1254-05fc-4ee8-9962-ee09ec1f4096"
 		},
 		"ls_SftpStorage_properties_typeProperties_host": {
 			"type": "string",
@@ -102,32 +74,23 @@
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
 					},
-					"AzureDataLakeStorage1_servicePrincipalCredential": {
-						"value": "[parameters('AzureDataLakeStorage1_servicePrincipalCredential')]"
-					},
 					"ls_AzureBlobStorageArchive_connectionString": {
 						"value": "[parameters('ls_AzureBlobStorageArchive_connectionString')]"
-					},
-					"ls_AzureSqlDatabase_password": {
-						"value": "[parameters('ls_AzureSqlDatabase_password')]"
-					},
-					"ls_DLakeStorage_servicePrincipalCredential": {
-						"value": "[parameters('ls_DLakeStorage_servicePrincipalCredential')]"
 					},
 					"ls_SftpStorage_password": {
 						"value": "[parameters('ls_SftpStorage_password')]"
 					},
-					"AzureDataLakeStorage1_properties_typeProperties_url": {
-						"value": "[parameters('AzureDataLakeStorage1_properties_typeProperties_url')]"
-					},
-					"AzureDataLakeStorage1_properties_typeProperties_tenant": {
-						"value": "[parameters('AzureDataLakeStorage1_properties_typeProperties_tenant')]"
-					},
-					"AzureDataLakeStorage1_properties_typeProperties_servicePrincipalId": {
-						"value": "[parameters('AzureDataLakeStorage1_properties_typeProperties_servicePrincipalId')]"
-					},
 					"ls_AzureKeyVault_properties_typeProperties_baseUrl": {
 						"value": "[parameters('ls_AzureKeyVault_properties_typeProperties_baseUrl')]"
+					},
+					"ls_SftpStorage_properties_typeProperties_host": {
+						"value": "[parameters('ls_SftpStorage_properties_typeProperties_host')]"
+					},
+					"ls_SftpStorage_properties_typeProperties_userName": {
+						"value": "[parameters('ls_SftpStorage_properties_typeProperties_userName')]"
+					},
+					"ls_AzureDatabricks_properties_typeProperties_existingClusterId": {
+						"value": "[parameters('ls_AzureDatabricks_properties_typeProperties_existingClusterId')]"
 					},
 					"ls_AzureSqlDatabase_properties_typeProperties_server": {
 						"value": "[parameters('ls_AzureSqlDatabase_properties_typeProperties_server')]"
@@ -140,18 +103,6 @@
 					},
 					"ls_DLakeStorage_properties_typeProperties_url": {
 						"value": "[parameters('ls_DLakeStorage_properties_typeProperties_url')]"
-					},
-					"ls_DLakeStorage_properties_typeProperties_tenant": {
-						"value": "[parameters('ls_DLakeStorage_properties_typeProperties_tenant')]"
-					},
-					"ls_DLakeStorage_properties_typeProperties_servicePrincipalId": {
-						"value": "[parameters('ls_DLakeStorage_properties_typeProperties_servicePrincipalId')]"
-					},
-					"ls_SftpStorage_properties_typeProperties_host": {
-						"value": "[parameters('ls_SftpStorage_properties_typeProperties_host')]"
-					},
-					"ls_SftpStorage_properties_typeProperties_userName": {
-						"value": "[parameters('ls_SftpStorage_properties_typeProperties_userName')]"
 					}
 				}
 			},

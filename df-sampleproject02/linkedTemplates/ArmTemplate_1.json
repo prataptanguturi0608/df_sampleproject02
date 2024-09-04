@@ -13,6 +13,88 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/ds_bronze_products')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_DLakeStorage",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "ADF_sampleproject02/ds_Bronze To Silver"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "products",
+						"fileSystem": "project02-bronze"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "productid",
+						"type": "String"
+					},
+					{
+						"name": "productname",
+						"type": "String"
+					},
+					{
+						"name": "productcategory",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_silver_Products')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_DLakeStorage",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "ADF_sampleproject02/ds_Silver To Gold"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "*.parquet",
+						"folderPath": "products",
+						"fileSystem": "project02-silver"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": [
+					{
+						"name": "productid",
+						"type": "INT32"
+					},
+					{
+						"name": "productname",
+						"type": "UTF8"
+					},
+					{
+						"name": "productcategory",
+						"type": "UTF8"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/ds_silver_Sales')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -29,7 +111,8 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobFSLocation",
-						"fileName": "Sales_CleansedData_2024-08-31.parquet",
+						"fileName": "*.parquet",
+						"folderPath": "sales",
 						"fileSystem": "project02-silver"
 					},
 					"compressionCodec": "snappy"
@@ -80,7 +163,8 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobFSLocation",
-						"fileName": "Customers_CleansedData_2024-08-31.parquet",
+						"fileName": "*.parquet",
+						"folderPath": "customers",
 						"fileSystem": "project02-silver"
 					},
 					"compressionCodec": "snappy"
@@ -103,6 +187,84 @@
 						"type": "UTF8"
 					}
 				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_CleansedToStrucutred')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Notebook1",
+						"type": "DatabricksNotebook",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/Shared/Project02/Notebook_SilverToGold"
+						},
+						"linkedServiceName": {
+							"referenceName": "ls_AzureDatabricks",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Delete1",
+						"type": "Delete",
+						"dependsOn": [
+							{
+								"activity": "Notebook1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataset": {
+								"referenceName": "ds_Silver",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"logStorageSettings": {
+								"linkedServiceName": {
+									"referenceName": "ls_AzureBlobStorageArchive",
+									"type": "LinkedServiceReference"
+								},
+								"path": "project02-activitylog"
+							},
+							"enableLogging": true,
+							"storeSettings": {
+								"type": "AzureBlobFSReadSettings",
+								"recursive": true,
+								"enablePartitionDiscovery": false
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "ADF_SampleProject02"
+				},
+				"annotations": [],
+				"lastPublishTime": "2024-08-28T08:07:27Z"
 			},
 			"dependsOn": []
 		},
@@ -365,6 +527,10 @@
 			"type": "Microsoft.DataFactory/factories/dataflows",
 			"apiVersion": "2018-06-01",
 			"properties": {
+				"description": "",
+				"folder": {
+					"name": "ADF_SampleProject02"
+				},
 				"type": "MappingDataFlow",
 				"typeProperties": {
 					"sources": [
@@ -548,6 +714,7 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/ds_silver_Sales')]",
+				"[concat(variables('factoryId'), '/datasets/ds_silver_Products')]",
 				"[concat(variables('factoryId'), '/datasets/ds_silver_customers')]"
 			]
 		},
@@ -556,6 +723,9 @@
 			"type": "Microsoft.DataFactory/factories/dataflows",
 			"apiVersion": "2018-06-01",
 			"properties": {
+				"folder": {
+					"name": "ADF_SampleProject02"
+				},
 				"type": "MappingDataFlow",
 				"typeProperties": {
 					"sources": [
@@ -576,32 +746,32 @@
 					],
 					"sinks": [
 						{
-							"dataset": {
-								"referenceName": "ds_Silver_Parquet_out",
-								"type": "DatasetReference"
+							"linkedService": {
+								"referenceName": "ls_DLakeStorage",
+								"type": "LinkedServiceReference"
 							},
-							"name": "ProductsDataSink"
+							"name": "ProductsDataSinkDeltaForamat"
 						},
 						{
-							"dataset": {
-								"referenceName": "ds_Silver_Parquet_out",
-								"type": "DatasetReference"
+							"linkedService": {
+								"referenceName": "ls_DLakeStorage",
+								"type": "LinkedServiceReference"
 							},
-							"name": "CustomersDataSink"
+							"name": "CustomersDataSinkDeltaForamt"
 						},
 						{
 							"dataset": {
 								"referenceName": "ds_AzureSQLDB_ProductsTBL",
 								"type": "DatasetReference"
 							},
-							"name": "sink1"
+							"name": "DataLoadToProductsTable"
 						},
 						{
 							"dataset": {
 								"referenceName": "ds_AzureSQLDB_CustomersTBL",
 								"type": "DatasetReference"
 							},
-							"name": "sink2"
+							"name": "DataLoadToCustomersTable"
 						}
 					],
 					"transformations": [
@@ -670,7 +840,17 @@
 						"select2 alterRow(upsertIf(true())) ~> AlterRow2",
 						"select1 sink(allowSchemaDrift: true,",
 						"     validateSchema: false,",
-						"     format: 'parquet',",
+						"     format: 'delta',",
+						"     fileSystem: 'project02-silver',",
+						"     folderPath: 'Products',",
+						"     mergeSchema: false,",
+						"     autoCompact: false,",
+						"     optimizedWrite: false,",
+						"     vacuum: 0,",
+						"     deletable: false,",
+						"     insertable: true,",
+						"     updateable: false,",
+						"     upsertable: false,",
 						"     partitionFileNames:[(concat('Products_CleansedData_',toString(currentDate()),'.parquet'))],",
 						"     umask: 0022,",
 						"     preCommands: [],",
@@ -682,10 +862,20 @@
 						"          productname,",
 						"          productcategory",
 						"     ),",
-						"     partitionBy('hash', 1)) ~> ProductsDataSink",
+						"     partitionBy('hash', 1)) ~> ProductsDataSinkDeltaForamat",
 						"select2 sink(allowSchemaDrift: true,",
 						"     validateSchema: false,",
-						"     format: 'parquet',",
+						"     format: 'delta',",
+						"     fileSystem: 'project02-silver',",
+						"     folderPath: 'Customers',",
+						"     mergeSchema: false,",
+						"     autoCompact: false,",
+						"     optimizedWrite: false,",
+						"     vacuum: 0,",
+						"     deletable: false,",
+						"     insertable: true,",
+						"     updateable: false,",
+						"     upsertable: false,",
 						"     partitionFileNames:[(concat('Customers_CleansedData_',toString(currentDate()),'.parquet'))],",
 						"     umask: 0022,",
 						"     preCommands: [],",
@@ -694,11 +884,11 @@
 						"     skipDuplicateMapOutputs: true,",
 						"     mapColumn(",
 						"          CustomerID,",
-						"          First_Name = {First Name},",
-						"          Last_Name = {Last Name},",
+						"          FirstName = {First Name},",
+						"          LastName = {Last Name},",
 						"          Gender",
 						"     ),",
-						"     partitionBy('hash', 1)) ~> CustomersDataSink",
+						"     partitionBy('hash', 1)) ~> CustomersDataSinkDeltaForamt",
 						"AlterRow1 sink(allowSchemaDrift: true,",
 						"     validateSchema: false,",
 						"     deletable:false,",
@@ -709,7 +899,12 @@
 						"     format: 'table',",
 						"     skipDuplicateMapInputs: true,",
 						"     skipDuplicateMapOutputs: true,",
-						"     errorHandlingOption: 'stopOnFirstError') ~> sink1",
+						"     errorHandlingOption: 'stopOnFirstError',",
+						"     mapColumn(",
+						"          productid,",
+						"          productname,",
+						"          productcategory",
+						"     )) ~> DataLoadToProductsTable",
 						"AlterRow2 sink(allowSchemaDrift: true,",
 						"     validateSchema: false,",
 						"     input(",
@@ -726,17 +921,28 @@
 						"     format: 'table',",
 						"     skipDuplicateMapInputs: true,",
 						"     skipDuplicateMapOutputs: true,",
-						"     errorHandlingOption: 'stopOnFirstError') ~> sink2"
+						"     errorHandlingOption: 'stopOnFirstError',",
+						"     mapColumn(",
+						"          CustomerID,",
+						"          First_Name = {First Name},",
+						"          Last_Name = {Last Name},",
+						"          Gender",
+						"     )) ~> DataLoadToCustomersTable"
 					]
 				}
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/ds_bronze_products')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/df_bronzeToSilver_SalesData')]",
 			"type": "Microsoft.DataFactory/factories/dataflows",
 			"apiVersion": "2018-06-01",
 			"properties": {
+				"folder": {
+					"name": "ADF_SampleProject02"
+				},
 				"type": "MappingDataFlow",
 				"typeProperties": {
 					"sources": [
@@ -757,11 +963,11 @@
 							"name": "SalesDataLoadtoAzureSQL"
 						},
 						{
-							"dataset": {
-								"referenceName": "ds_Silver_Parquet_out",
-								"type": "DatasetReference"
+							"linkedService": {
+								"referenceName": "ls_DLakeStorage",
+								"type": "LinkedServiceReference"
 							},
-							"name": "sink1"
+							"name": "SalesDataSinkDeltaFormat"
 						}
 					],
 					"transformations": [
@@ -837,70 +1043,28 @@
 						"     )) ~> SalesDataLoadtoAzureSQL",
 						"select1 sink(allowSchemaDrift: true,",
 						"     validateSchema: false,",
-						"     format: 'parquet',",
+						"     format: 'delta',",
+						"     fileSystem: 'project02-silver',",
+						"     folderPath: 'Sales',",
+						"     mergeSchema: false,",
+						"     autoCompact: false,",
+						"     optimizedWrite: false,",
+						"     vacuum: 0,",
+						"     deletable: false,",
+						"     insertable: true,",
+						"     updateable: false,",
+						"     upsertable: false,",
 						"     partitionFileNames:[(concat('Sales_CleansedData_',toString(currentDate()) ,'.parquet'))],",
 						"     umask: 0022,",
 						"     preCommands: [],",
 						"     postCommands: [],",
 						"     skipDuplicateMapInputs: true,",
 						"     skipDuplicateMapOutputs: true,",
-						"     partitionBy('hash', 1)) ~> sink1"
+						"     partitionBy('hash', 1)) ~> SalesDataSinkDeltaFormat"
 					]
 				}
 			},
 			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/pl_CleansedToStrucutred')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "df_SilverToGold_DW",
-						"type": "ExecuteDataFlow",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"dataflow": {
-								"referenceName": "df_SilverToGold_DW",
-								"type": "DataFlowReference",
-								"parameters": {},
-								"datasetParameters": {
-									"SalesCleansedData": {},
-									"ProductsCleansedData": {},
-									"CustomersCleansedData": {},
-									"DWSink": {}
-								}
-							},
-							"staging": {},
-							"compute": {
-								"coreCount": 8,
-								"computeType": "General"
-							},
-							"traceLevel": "Fine"
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"folder": {
-					"name": "ADF_SampleProject02"
-				},
-				"annotations": [],
-				"lastPublishTime": "2024-08-28T08:07:27Z"
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/dataflows/df_SilverToGold_DW')]"
-			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/pl_RawToCleansed')]",
@@ -928,10 +1092,10 @@
 								"datasetParameters": {
 									"ProductsDataIn": {},
 									"CustomersDataIn": {},
-									"ProductsDataSink": {},
-									"CustomersDataSink": {},
-									"sink1": {},
-									"sink2": {}
+									"ProductsDataSinkDeltaForamat": {},
+									"CustomersDataSinkDeltaForamt": {},
+									"DataLoadToProductsTable": {},
+									"DataLoadToCustomersTable": {}
 								}
 							},
 							"staging": {},
@@ -1024,7 +1188,7 @@
 											"datasetParameters": {
 												"SalesDataIn": {},
 												"SalesDataLoadtoAzureSQL": {},
-												"sink1": {}
+												"SalesDataSinkDeltaFormat": {}
 											}
 										},
 										"staging": {},
@@ -1238,6 +1402,8 @@
 					{
 						"name": "pl_SftpToRaw",
 						"type": "ExecutePipeline",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [],
 						"policy": {
 							"secureInput": false
