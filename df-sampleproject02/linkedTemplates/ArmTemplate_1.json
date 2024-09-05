@@ -527,7 +527,6 @@
 			"type": "Microsoft.DataFactory/factories/dataflows",
 			"apiVersion": "2018-06-01",
 			"properties": {
-				"description": "",
 				"folder": {
 					"name": "ADF_SampleProject02"
 				},
@@ -1402,8 +1401,6 @@
 					{
 						"name": "pl_SftpToRaw",
 						"type": "ExecutePipeline",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [],
 						"policy": {
 							"secureInput": false
