@@ -1,22 +1,24 @@
 {
-	"name": "ds_Silver_Parquet_out",
+	"name": "ds_Silver",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "ls_DLakeStorage",
 			"type": "LinkedServiceReference"
 		},
 		"folder": {
-			"name": "ADF_sampleproject02/ds_Bronze To Silver"
+			"name": "ADF_sampleproject02/ds_Silver To Gold"
 		},
 		"annotations": [],
-		"type": "Parquet",
+		"type": "Binary",
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
+				"folderPath": {
+					"value": "*",
+					"type": "Expression"
+				},
 				"fileSystem": "project02-silver"
-			},
-			"compressionCodec": "snappy"
-		},
-		"schema": []
+			}
+		}
 	}
 }

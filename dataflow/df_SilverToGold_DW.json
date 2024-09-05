@@ -1,6 +1,10 @@
 {
 	"name": "df_SilverToGold_DW",
 	"properties": {
+		"description": "",
+		"folder": {
+			"name": "ADF_SampleProject02"
+		},
 		"type": "MappingDataFlow",
 		"typeProperties": {
 			"sources": [

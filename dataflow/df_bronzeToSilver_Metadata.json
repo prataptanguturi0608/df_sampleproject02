@@ -1,6 +1,9 @@
 {
 	"name": "df_bronzeToSilver_Metadata",
 	"properties": {
+		"folder": {
+			"name": "ADF_SampleProject02"
+		},
 		"type": "MappingDataFlow",
 		"typeProperties": {
 			"sources": [
@@ -21,32 +24,32 @@
 			],
 			"sinks": [
 				{
-					"dataset": {
-						"referenceName": "ds_Silver_Parquet_out",
-						"type": "DatasetReference"
+					"linkedService": {
+						"referenceName": "ls_DLakeStorage",
+						"type": "LinkedServiceReference"
 					},
-					"name": "ProductsDataSink"
+					"name": "ProductsDataSinkDeltaForamat"
 				},
 				{
-					"dataset": {
-						"referenceName": "ds_Silver_Parquet_out",
-						"type": "DatasetReference"
+					"linkedService": {
+						"referenceName": "ls_DLakeStorage",
+						"type": "LinkedServiceReference"
 					},
-					"name": "CustomersDataSink"
+					"name": "CustomersDataSinkDeltaForamt"
 				},
 				{
 					"dataset": {
 						"referenceName": "ds_AzureSQLDB_ProductsTBL",
 						"type": "DatasetReference"
 					},
-					"name": "sink1"
+					"name": "DataLoadToProductsTable"
 				},
 				{
 					"dataset": {
 						"referenceName": "ds_AzureSQLDB_CustomersTBL",
 						"type": "DatasetReference"
 					},
-					"name": "sink2"
+					"name": "DataLoadToCustomersTable"
 				}
 			],
 			"transformations": [
@@ -115,7 +118,17 @@
 				"select2 alterRow(upsertIf(true())) ~> AlterRow2",
 				"select1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
-				"     format: 'parquet',",
+				"     format: 'delta',",
+				"     fileSystem: 'project02-silver',",
+				"     folderPath: 'Products',",
+				"     mergeSchema: false,",
+				"     autoCompact: false,",
+				"     optimizedWrite: false,",
+				"     vacuum: 0,",
+				"     deletable: false,",
+				"     insertable: true,",
+				"     updateable: false,",
+				"     upsertable: false,",
 				"     partitionFileNames:[(concat('Products_CleansedData_',toString(currentDate()),'.parquet'))],",
 				"     umask: 0022,",
 				"     preCommands: [],",
@@ -127,10 +140,20 @@
 				"          productname,",
 				"          productcategory",
 				"     ),",
-				"     partitionBy('hash', 1)) ~> ProductsDataSink",
+				"     partitionBy('hash', 1)) ~> ProductsDataSinkDeltaForamat",
 				"select2 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
-				"     format: 'parquet',",
+				"     format: 'delta',",
+				"     fileSystem: 'project02-silver',",
+				"     folderPath: 'Customers',",
+				"     mergeSchema: false,",
+				"     autoCompact: false,",
+				"     optimizedWrite: false,",
+				"     vacuum: 0,",
+				"     deletable: false,",
+				"     insertable: true,",
+				"     updateable: false,",
+				"     upsertable: false,",
 				"     partitionFileNames:[(concat('Customers_CleansedData_',toString(currentDate()),'.parquet'))],",
 				"     umask: 0022,",
 				"     preCommands: [],",
@@ -139,11 +162,11 @@
 				"     skipDuplicateMapOutputs: true,",
 				"     mapColumn(",
 				"          CustomerID,",
-				"          First_Name = {First Name},",
-				"          Last_Name = {Last Name},",
+				"          FirstName = {First Name},",
+				"          LastName = {Last Name},",
 				"          Gender",
 				"     ),",
-				"     partitionBy('hash', 1)) ~> CustomersDataSink",
+				"     partitionBy('hash', 1)) ~> CustomersDataSinkDeltaForamt",
 				"AlterRow1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     deletable:false,",
@@ -154,7 +177,12 @@
 				"     format: 'table',",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true,",
-				"     errorHandlingOption: 'stopOnFirstError') ~> sink1",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          productid,",
+				"          productname,",
+				"          productcategory",
+				"     )) ~> DataLoadToProductsTable",
 				"AlterRow2 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
@@ -171,7 +199,13 @@
 				"     format: 'table',",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true,",
-				"     errorHandlingOption: 'stopOnFirstError') ~> sink2"
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          CustomerID,",
+				"          First_Name = {First Name},",
+				"          Last_Name = {Last Name},",
+				"          Gender",
+				"     )) ~> DataLoadToCustomersTable"
 			]
 		}
 	}

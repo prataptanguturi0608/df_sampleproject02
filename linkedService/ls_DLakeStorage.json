@@ -1,15 +1,19 @@
 {
 	"name": "ls_DLakeStorage",
-	"type": "Microsoft.DataFactory/factories/linkedservices",
 	"properties": {
 		"annotations": [],
 		"type": "AzureBlobFS",
 		"typeProperties": {
 			"url": "https://dlakeadf.dfs.core.windows.net/",
-			"tenant": "0320f3ce-af6b-4b19-80da-d948d9d67a09",
-			"servicePrincipalId": "22de1254-05fc-4ee8-9962-ee09ec1f4096",
-			"servicePrincipalCredentialType": "ServicePrincipalKey",
-			"encryptedCredential": "ew0KICAiVmVyc2lvbiI6ICIyMDE3LTExLTMwIiwNCiAgIlByb3RlY3Rpb25Nb2RlIjogIktleSIsDQogICJTZWNyZXRDb250ZW50VHlwZSI6ICJQbGFpbnRleHQiLA0KICAiQ3JlZGVudGlhbElkIjogIkRBVEFGQUNUT1JZQDU5QkRCQjM1LTQwMUQtNEZGRS05QUI5LUE0MjVBM0VFOUU4OV9hMmM2MDgxMy1lZDUzLTQzYjYtOGUwZS1hZmJkYzFkMWZkMmEiDQp9"
+			"accountKey": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "ls_AzureKeyVault",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "ADLStorage-accesskey"
+			}
 		}
-	}
+	},
+	"type": "Microsoft.DataFactory/factories/linkedservices"
 }

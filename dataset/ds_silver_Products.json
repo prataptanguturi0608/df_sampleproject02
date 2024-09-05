@@ -13,7 +13,8 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"fileName": "Products_CleansedData_2024-08-31.parquet",
+				"fileName": "*.parquet",
+				"folderPath": "products",
 				"fileSystem": "project02-silver"
 			},
 			"compressionCodec": "snappy"
